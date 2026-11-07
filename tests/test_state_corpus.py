@@ -9,7 +9,7 @@ from bots.common.safe import wrap
 from league.zoo.simple import factory
 
 ROOT = Path(__file__).resolve().parent
-BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "random", "calling_station",
+BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "random", "calling_station",
              "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise")
 
 
@@ -17,7 +17,7 @@ def make_bots():
     bots = {}
     memories = {}
     for name in BOT_NAMES:
-        if name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned"}:
+        if name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger"}:
             module = importlib.import_module(f"bots.{name}.bot")
             load = getattr(module, "load", None)
             if load:
