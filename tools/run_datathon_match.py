@@ -54,9 +54,10 @@ def stop(process):
             process.wait(timeout=5)
 
 
-def play_half(half, opponent, opponent_label, seed, deals, agent_port, opp_port, outdir):
+def play_half(half, opponent, opponent_label, our_bot, seed, deals, agent_port, opp_port, outdir, keep_logs):
     env_agent = os.environ.copy()
     env_agent["PORT"] = str(agent_port)
+    env_agent["POKER_BOT"] = our_bot
     env_opp = os.environ.copy()
     env_opp["PORT"] = str(opp_port)
     env_opp["PYTHONPATH"] = os.pathsep.join(
@@ -71,11 +72,15 @@ def play_half(half, opponent, opponent_label, seed, deals, agent_port, opp_port,
     else:
         opponent_cmd = [sys.executable, f"baseline-bots/{opponent}.py"]
         opponent_cwd = ROOT
+    if opponent.startswith("bot:"):
+        env_opp["POKER_BOT"] = opponent.removeprefix("bot:")
+        opponent_cmd = [sys.executable, "agent.py"]
+        opponent_cwd = ROOT
     opp = subprocess.Popen(opponent_cmd, cwd=opponent_cwd, env=env_opp,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     path = outdir / f"half{half}.json"
     try:
-        wait_for_server(agent_port, "MAKK", agent)
+        wait_for_server(agent_port, our_bot, agent)
         expected = {
             "baseline_random": "RandomBot",
             "baseline_calling_station": "CallingStation",
@@ -83,11 +88,14 @@ def play_half(half, opponent, opponent_label, seed, deals, agent_port, opp_port,
             "baseline_always_pot": "AlwaysPot",
         }.get(opponent, opponent_label)
         wait_for_server(opp_port, expected, opp)
-        result = subprocess.run([
+        command = [
             sys.executable, "judge_engine.py", "--half", str(half),
             "--agent1", str(agent_port), "--agent2", str(opp_port),
             "--seed", str(seed), "--deals", str(deals), "--json", str(path),
-        ], cwd=ROOT, text=True, capture_output=True, timeout=max(120, deals * 0.5))
+        ]
+        if keep_logs:
+            command.append("--logs")
+        result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, timeout=max(120, deals * 0.5))
         if result.returncode:
             raise RuntimeError(result.stdout + result.stderr)
         print(result.stdout.strip())
@@ -105,28 +113,33 @@ def append_league_result(opponent, seed, deals, match_result):
     stats = match_result["agent_stats"]["agent1"]
     verdict = {"AGENT1_WIN": "win", "AGENT2_WIN": "loss", "CHOP": "chop"}.get(match_result["verdict"], match_result["verdict"].lower())
     row = {
-        "bot": "m1_equity", "opponent": opponent.removeprefix("baseline_").removeprefix("script:"), "seed": seed, "deals": deals,
+        "bot": match_result.get("agent1_name", "m1_equity").split(" / ")[-1].split(" (")[0],
+        "opponent": opponent.removeprefix("baseline_").removeprefix("script:").removeprefix("bot:"), "seed": seed, "deals": deals,
         "bb_deal": match_result["mean_bb_per_deal"], "ci_low": match_result["ci"][0], "ci_high": match_result["ci"][1],
         "verdict": verdict, "errors": sum(item["errors"] for item in stats), "fallbacks": "",
         "think_s": max(item["time_seconds"] for item in stats), "p50_ms": "", "p99_ms": "",
         "elapsed": match_result["elapsed_seconds"],
     }
     with path.open("a", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=fields, extrasaction="ignore")
+        writer = csv.DictWriter(output, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
         writer.writerow(row)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--bot", default="m1_equity", help="our strategy from bots/ or bots.portfolio")
     opponent_group = parser.add_mutually_exclusive_group()
-    opponent_group.add_argument("--opponent", choices=(*BASELINES, "all"), default="baseline_random")
+    opponent_group.add_argument("--opponent", choices=(*BASELINES, "all"))
+    opponent_group.add_argument("--opponent-bot", help="play against another local strategy from bots/")
     opponent_group.add_argument("--opponent-script", help="path to a compatible opponent Python server script")
     parser.add_argument("--opponent-name", help="label and / health-check agent_name for --opponent-script")
     parser.add_argument("--seed", default="7", help="first reproducible match seed")
     parser.add_argument("--seeds", type=int, default=1, help="number of sequential seeds to run")
     parser.add_argument("--deals", type=int, default=1000)
     parser.add_argument("--outdir", default="/tmp/pokerMAKK-datathon")
+    parser.add_argument("--logs", action="store_true", help="include full hand histories for the visual replay viewer")
     args = parser.parse_args()
+    selected_opponent = args.opponent or "baseline_random"
     if args.opponent_script:
         if not args.opponent_name:
             parser.error("--opponent-name is required with --opponent-script; it must match GET / agent_name")
@@ -135,8 +148,11 @@ def main():
             parser.error(f"opponent script does not exist: {script}")
         opponents = (f"script:{script}",)
         labels = {opponents[0]: args.opponent_name}
+    elif args.opponent_bot:
+        opponents = (f"bot:{args.opponent_bot}",)
+        labels = {opponents[0]: args.opponent_bot}
     else:
-        opponents = BASELINES if args.opponent == "all" else (args.opponent,)
+        opponents = BASELINES if selected_opponent == "all" else (selected_opponent,)
         labels = {}
     root_outdir = Path(args.outdir)
     root_outdir.mkdir(parents=True, exist_ok=True)
@@ -160,7 +176,7 @@ def main():
                     "baseline_calling_station": "CallingStation",
                     "baseline_always_half": "AlwaysHalf",
                     "baseline_always_pot": "AlwaysPot",
-                }.get(opponent, opponent)), seed, args.deals, agent_port, opp_port, outdir)
+                }.get(opponent, opponent)), args.bot, seed, args.deals, agent_port, opp_port, outdir, args.logs)
                 for h in (1, 2)
             ]
             combined = outdir / "match.json"

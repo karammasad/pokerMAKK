@@ -58,12 +58,12 @@ def stop(process):
 
 def test_http_judge_matches_inprocess_paired_chips(tmp_path):
     agent_port, opp_port = free_port(), free_port()
-    env_agent = os.environ.copy(); env_agent["PORT"] = str(agent_port)
+    env_agent = os.environ.copy(); env_agent["PORT"] = str(agent_port); env_agent["POKER_BOT"] = "m1_equity"
     env_opp = os.environ.copy(); env_opp["PORT"] = str(opp_port)
     agent = subprocess.Popen([sys.executable, "agent.py"], cwd=ROOT, env=env_agent, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     opponent = subprocess.Popen([sys.executable, "baseline-bots/baseline_random.py"], cwd=ROOT, env=env_opp, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
-        wait_for_name(agent_port, "MAKK", agent)
+        wait_for_name(agent_port, "m1_equity", agent)
         wait_for_name(opp_port, "RandomBot", opponent)
         seed, deals = "http-parity", 16
         output = tmp_path / "judge.json"

@@ -13,13 +13,18 @@ import game
 from game import Action, AgentConfig
 from bots.common.safe import wrap
 from league.zoo.simple import factory
+from bots.portfolio import factory as portfolio_factory, names as portfolio_names
 
 ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise"]
+PORTFOLIO = list(portfolio_names())
+RESEARCH_CANDIDATES = PORTFOLIO + ["mccfr"]
 
 
 def load_bot(name):
     if name in ZOO:
         return factory(name)
+    if name in PORTFOLIO:
+        return portfolio_factory(name)
     mod = importlib.import_module(f"bots.{name}.bot")
     hook = getattr(mod, "load", None)
     if hook:
@@ -95,15 +100,15 @@ def match(bot_name, opp_name, seed, deals):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--bot", default="m1_equity")
-    p.add_argument("--opp", default="all")
+    p.add_argument("--bot", default="m1_equity", help="strategy module or portfolio candidate")
+    p.add_argument("--opp", default="all", help="comma-separated opponents, or all (zoo + portfolio)")
     p.add_argument("--zoo", choices=["all"], help="alias for --opp all")
     p.add_argument("--deals", type=int, default=1000)
     p.add_argument("--seeds", type=int, default=3)
     p.add_argument("--timing", action="store_true")
     p.add_argument("--out", default="league/results.csv")
     args = p.parse_args()
-    opponents = ZOO if args.zoo or args.opp == "all" else [x.strip() for x in args.opp.split(",")]
+    opponents = ZOO + RESEARCH_CANDIDATES if args.zoo or args.opp == "all" else [x.strip() for x in args.opp.split(",")]
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     exists = os.path.exists(args.out)
     with open(args.out, "a", newline="") as f:
