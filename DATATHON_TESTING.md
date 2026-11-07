@@ -101,3 +101,7 @@ This is the same Docker build and restricted-container smoke check used by the s
 ## What a match result means
 
 A single half is mostly card luck. The judge keeps the same deals and swaps seats for the second half, then reports the mean big blinds per deal and a 95% confidence interval. Above zero is a win, below zero is a loss, and an interval touching zero is a chop. A five-error half is a forfeit. Track errors, timeouts, and decision time along with chip results.
+
+For stable runnable IDs, readable names, and teammate naming guidance, see [BOT_CATALOG.md](BOT_CATALOG.md).
+
+To use an untouched range for the in-process screen, add `--seed-start 900 --seeds 3`. Match the same opponents, deal counts, and seeds when comparing candidates, and use different seeds for selection and final confirmation.
