@@ -25,6 +25,18 @@ def canonical_suits(cards):
     return best
 
 
+def canonical_state(hole, board):
+    """Canonicalize suit labels while keeping the private/public card groups."""
+    best = None
+    for perm in itertools.permutations(range(4)):
+        h = tuple(sorted(((card >> 2) << 2) | perm[card & 3] for card in hole))
+        b = tuple(sorted(((card >> 2) << 2) | perm[card & 3] for card in board))
+        candidate = (h, b)
+        if best is None or candidate < best:
+            best = candidate
+    return best
+
+
 def hand_features(hole, board=()):
     ranks = [c >> 2 for c in hole]
     suits = [c & 3 for c in hole]

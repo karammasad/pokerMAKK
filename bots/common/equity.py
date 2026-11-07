@@ -2,6 +2,7 @@
 import random
 from functools import lru_cache
 from evaluator import omaha_score
+from bots.common.cards import canonical_state
 
 
 def _seed(hole, board):
@@ -29,4 +30,5 @@ def _cached(hole, board, samples):
 
 def equity_vs_random(hole, board=(), samples=32):
     """Estimate showdown equity against a uniformly random legal hand."""
-    return _cached(tuple(hole), tuple(board), samples)
+    canonical_hole, canonical_board = canonical_state(tuple(hole), tuple(board))
+    return _cached(canonical_hole, canonical_board, samples)

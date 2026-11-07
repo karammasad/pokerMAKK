@@ -1,0 +1,45 @@
+{
+  "seed": 20261107,
+  "states": 12000,
+  "deals_walked": 2012,
+  "modes": [
+    "passive",
+    "random",
+    "half_pressure",
+    "pot_pressure",
+    "call_heavy"
+  ],
+  "coverage": {
+    "street": {
+      "PREFLOP": 5446,
+      "FLOP": 2947,
+      "TURN": 1910,
+      "RIVER": 1697
+    },
+    "button": {
+      "button": 6241,
+      "big_blind": 5759
+    },
+    "facing_bet": {
+      "True": 5454,
+      "False": 6546
+    },
+    "all_in_response": {
+      "False": 11352,
+      "True": 648
+    },
+    "raise_count": {
+      "0": 8558,
+      "1": 1515,
+      "2": 937,
+      "3": 609,
+      "4": 381
+    },
+    "legal_set": {
+      "FOLD,CHECK_CALL,RAISE_HALF,RAISE_POT": 4806,
+      "CHECK_CALL,RAISE_HALF,RAISE_POT": 6546,
+      "FOLD,CHECK_CALL": 648
+    }
+  },
+  "corpus": "decision_states.jsonl.gz"
+}

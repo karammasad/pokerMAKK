@@ -296,12 +296,15 @@ Merge to main only through the adoption rule.
 
 ### Checks completed
 
-- `python3 -m pytest -q`: 16 passed.
+- `python3 -m pytest -q`: 27 passed, 1 optional HTTP test skipped; `RUN_HTTP_MATCH_TESTS=1 python3 -m pytest -q tests/test_datathon_http.py`: 1 passed.
 - `python3 tools/smoke_test.py --port 5008`: passed; all five sample decisions were legal and returned in 1–4 ms.
 - Startup: about 0.4 seconds on the development machine.
-- Real HTTP duplicate matches: Method 1 won all three 1,000-deal seeds against each starter baseline, with zero errors.
-- In-process league: Method 1 won all three 1,000-deal seeds against each of the nine zoo opponents, with zero errors and fallbacks. Targeted timing runs measured each half at 2.19–2.38 seconds worst-case and p99 decisions below 1.2 ms.
-- Methods 2–4 passed 5,000-state legal-action fuzzing and short all-zoo league smoke runs with zero errors. These short runs are not adoption evidence.
+- Fresh-server real HTTP duplicate matches after suit-canonical equity changes: Method 1 won all 12 matches (four starter baselines × seeds 7–9, 1,000 deals each), with zero errors; slowest thinking half 1.25 seconds.
+- In-process league after suit-canonical equity changes: Method 1 won all 27 runs (nine zoo opponents × three 1,000-deal seeds), with zero errors and fallbacks. Slowest half 2.75 seconds; worst p99 decision 5.04 ms, below the 20 ms cap.
+- Methods 2–4 passed the 5,000-state legal-action fuzz test and 12,000-state stratified corpus, plus short all-zoo league smoke runs with zero errors. These short runs are not adoption evidence.
+- `tools/run_datathon_match.py` now starts fresh HTTP servers for each half, combines with the official judge, and appends results to the league ledger. A 1,000-deal random-baseline example won +9.089 bb/deal (95% CI [+7.755, +10.424]) with zero errors.
 - `./tools/check_build.sh` could not complete: Docker Desktop first failed while extracting the PyTorch base image with a disk I/O error, then stopped answering `docker info`. Direct server smoke tests passed. Retry the Docker check after Docker Desktop is healthy.
 
 The first HTTP baseline batch left nine mislabeled rows in `league/results.csv`; `league/results_notes.md` identifies those append-only rows and the corrected rerun.
+- Added a stratified 12,000-observation regression corpus, academic research roadmap, and fresh-server Datathon test instructions in `RESEARCH_ROADMAP.md` and `DATATHON_TESTING.md`.
+- Latest fresh-server official-judge validation: 12 wins (four starter baselines × three 1,000-deal seeds), zero errors, slowest half 1.25 seconds.
