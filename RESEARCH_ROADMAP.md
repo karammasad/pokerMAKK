@@ -4,13 +4,13 @@
 
 There is no defensible way to promise an “absolute” winner against unknown submissions. The game is an imperfect-information, zero-sum problem, and our opponent population is only a proxy for the tournament field. The practical target is a bot that is hard to exploit, never forfeits, wins consistently against weaker styles, and has measured evidence for each change.
 
-`m1_equity` is the incumbent reference. `equity_guarded` now passes same-seed head-to-head adoption checks and is selected as the default policy; keep `m1_equity` available as the comparison fallback. Method 2 remains a coarse one-street warm start; Method 4's learned model is rejected because held-out MAE is still too high.
+`m5_challenger` is the selected default policy as of November 7, 2026. In fresh-server official-judge matches it beat `equity_guarded` by +0.362 bb/deal over 10,000 paired deals (95% CI [+0.205, +0.518]), and won all 12 matches against the four starter baselines (three 1,000-deal seeds each), with zero errors/timeouts. Keep `equity_guarded` and `m1_equity` as comparison fallbacks; the `POKER_BOT` environment variable can select any tested entry. Method 2 remains a coarse one-street warm start; Method 4's learned model is rejected because held-out MAE is still too high.
 
 ## Architecture to build toward
 
 1. **Verified game model and estimator.** Keep `game.py` and `evaluator.py` authoritative. Generate equity labels with `evaluator.omaha_score`; encode exact two-hole/three-board Omaha usage, suit-isomorphic cards, pot odds, position, stacks, and future-card potential.
 2. **Robust strategy backbone.** Replace the toy Method 2 payoff table with external-sampling MCCFR/CFR+ over the full sequential betting game. The action tree is exact because the game supplies four actions and raise sizes. Abstract cards by distributions over future hand strength/potential, then solve offline and ship a compact average strategy.
-3. **Bounded opponent adaptation.** Keep `equity_guarded` or a validated CFR strategy as the default. Estimate opponent ranges/tendencies with Bayesian shrinkage, and mix toward a best response only as the evidence grows. Add a stop-loss or uncertainty trigger that returns to the base strategy.
+3. **Bounded opponent adaptation.** Keep `m5_challenger` as the default while it holds its measured edge. Estimate opponent ranges/tendencies with Bayesian shrinkage, and mix toward a best response only as the evidence grows. Add a stop-loss or uncertainty trigger that returns to the base strategy.
 4. **Learned equity only as a measured replacement.** Train on independently generated state groups, not neighboring samples from the same exact deal. Predict mean and uncertainty (and eventually future potential), check calibration by street and texture, then require held-out MAE below 0.02, inference below 0.1 ms, and no league regression before activation.
 5. **Population improvement last.** Build an empirical payoff matrix across the zoo, snapshots, and varied opponent policies. Run PSRO-style best responses only after the candidate pool has enough reliable payoff data. Evaluate the chosen mixture on unseen seeds.
 
@@ -24,6 +24,7 @@ There is no defensible way to promise an “absolute” winner against unknown s
 - [Brown & Sandholm, “Superhuman AI for Heads-Up No-Limit Poker: Libratus Beats Top Professionals,” Science 2018](https://noambrown.github.io/papers/17-Science-Superhuman.pdf) motivates a robust equilibrium core, endgame reasoning, and systematic strategy repair rather than hand-written bluff rules.
 - [Burch et al., “AIVAT: A New Variance Reduction Technique for Agent Evaluation in Imperfect Information Games,” AAAI 2018](https://ojs.aaai.org/index.php/AAAI/article/view/11481) is a later evaluation improvement. We should first use paired duplicate seeds; add AIVAT only with a frozen, independently trained value estimator to avoid evaluation leakage.
 - [Lanctot et al., “A Unified Game-Theoretic Approach to Multiagent Reinforcement Learning,” NeurIPS 2017](https://proceedings.neurips.cc/paper/2017/hash/3323fe11e9595c09af38fe67567a9394-Abstract.html) motivates PSRO and a diverse opponent population. It also warns against overfitting to a small fixed set of opponents.
+- [Southey et al., “Bayes' Bluff: Opponent Modelling in Poker,” UAI 2005](https://webdocs.cs.ualberta.ca/~bowling/papers/05uai.pdf) motivates Bayesian opponent models that represent uncertainty over behavior and update as actions are observed. Our `bayes_ev` prototype uses a much smaller Dirichlet-smoothed fold/call/raise response model; it is an experiment, not a reproduction of their method.
 
 ## Work order
 
@@ -37,7 +38,9 @@ There is no defensible way to promise an “absolute” winner against unknown s
 
 ## Candidate portfolio (November 2026)
 
-`bots/portfolio.py` adds five explicit comparison policies: the current equity core, a guarded value policy, a pressure policy with a low river bluff frequency, a higher-sample equity version, and a bounded Bayesian action-frequency adapter. They are controlled ablations around the same evaluator/equity backbone. The official HTTP runner can select a candidate with `--bot` and an opposing local strategy with `--opponent-bot`.
+`bots/portfolio.py` adds six explicit comparison policies: the current equity core, a guarded value policy, a pressure policy with a low river bluff frequency, a higher-sample equity version, a bounded Bayesian action-frequency adapter, and `bayes_ev`, which estimates opponent fold/call/raise responses after our bets and compares their shrunk expected value with checking. These are controlled experiments around the same evaluator/equity backbone, not solved poker agents. The official HTTP runner can select a candidate with `--bot` and an opposing local strategy with `--opponent-bot`.
+
+The 57-match `bayes_ev` screen (three paired seeds × 200 deals against 19 practice, baseline, and portfolio opponents) averaged +4.070 bb/deal overall and made no errors or fallbacks. It averaged +1.00 bb/deal against the nine toy styles, but lost on all three seeds to `m1_equity` (−1.728 bb/deal) and `equity_guarded` (−2.462 bb/deal). Against the newly added `m5_challenger`, its three-seed mean was −1.478 bb/deal. Keep it as a benchmark and do not promote it. Raw results are in [`league/benchmarks/bayes_ev_screen.csv`](league/benchmarks/bayes_ev_screen.csv). The large overall mean is dominated by weak toy opponents and is not a measure of tournament strength.
 
 The repo also has an external-sampling MCCFR+ trainer over the official sequential betting game. It uses an explicit imperfect-recall abstraction, so full-game MCCFR convergence guarantees do not transfer to this prototype. Its 5,000-iteration policy covered 121,306 infosets (about 13 MB) and lost to `m1_equity` on three held-out 200-deal seeds, averaging **−5.47 bb/deal**. It remains research-only.
 

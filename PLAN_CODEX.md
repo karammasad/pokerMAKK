@@ -82,7 +82,7 @@ AGENTS.md
 PLAN_CODEX.md
 bots/
   __init__.py
-  active.py               # default ACTIVE_BOT = "equity_guarded"
+  active.py               # default ACTIVE_BOT = "m5_challenger"
   common/
     __init__.py
     safe.py               # safety wrapper
@@ -125,7 +125,7 @@ def new_half(config, memory): _BOT.new_half(config, memory)
 def choose_action(obs, memory): return _BOT.choose_action(obs, memory)
 def on_hand_end(result, memory): _BOT.on_hand_end(result, memory)
 ```
-`get_bot()` reads the `POKER_BOT` override or defaults to `equity_guarded`; it builds portfolio candidates or imports a bot module, then returns `safe.wrap(...)`.
+`get_bot()` reads the `POKER_BOT` override or defaults to `m5_challenger`; it builds portfolio candidates or imports a bot module, then returns `safe.wrap(...)`.
 
 ### 4.3 `league/run.py` (in-process duplicate league)
 - Uses `game.make_deal(seed, i)`, `game.button_for_deal(i)`, `game.Game(deal, button_seat, hand_index)`,
@@ -288,7 +288,7 @@ Merge to main only through the adoption rule.
 
 - Starter `heads-up-bundle` merged from `upstream/main`; the original starter runtime files are preserved except for the required participant identity and the marked bot forwarding section in `agent.py`.
 - Phase 1 infrastructure is present: `bots/common/{safe,cards,equity,timing}.py`, `league/run.py`, zoo opponents, and the safety, fuzz, and league tests.
-- `equity_guarded` is now the default strategy. It uses the validated Method 1 equity core with more conservative value/call thresholds; `m1_equity` remains the incumbent comparison. The suit-canonical preflop table has 19,998 entries, generated with 100 samples per hand.
+- `m5_challenger` is now the default strategy after 10,000 paired deals against `equity_guarded` (+0.362 bb/deal, 95% CI [+0.205, +0.518]) and 12 fresh-server wins against the four starter baselines. `equity_guarded` and `m1_equity` remain comparison policies. The suit-canonical preflop table has 19,998 entries, generated with 100 samples per hand.
 - Method 2 has a trained 150-state, coarse regret-matching table. Its trainer solves abstract one-street payoff states as a warm start; it is not a full-game MCCFR solution yet.
 - Method 3 has per-half opponent statistics, archetype rules, conservative exploits, and a base-strategy reversion guard. It remains experimental.
 - Method 4 has feature generation and NumPy training code. A 20,000-state experiment produced held-out MAE above 0.14, so the runtime rejects the model and falls back to Method 1 until a model meets the 0.05 MAE gate.
