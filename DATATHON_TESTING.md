@@ -37,17 +37,17 @@ python3 tools/run_datathon_match.py --opponent all --seed 7 --seeds 3 --deals 10
 
 It saves each half and the combined judge result under `/tmp/pokerMAKK-datathon/` and appends a summary row to `league/results.csv`. Use a different `--outdir` if you need to preserve prior run files.
 
-The current default, `equity_guarded`, won all 12 fresh-server matches against the four starter baselines (seeds 7–9, 1,000 deals each), with zero errors. The slowest thinking half was 0.77 seconds.
+The current default, `m5_challenger`, won all 12 fresh-server matches against the four starter baselines (seeds 7–9, 1,000 deals each), with zero errors/timeouts. It also beat `equity_guarded` on a 10-seed, 10,000-deal paired comparison: +0.362 bb/deal, 95% CI [+0.205, +0.518]. The per-match rows are in `league/results.csv`.
 
 ## 4. Compare our research-inspired candidates
 
-The local league can screen the five equity portfolio candidates against all nine practice styles and one another:
+The local league can screen the six portfolio candidates against all nine practice styles and one another (and compare new strategies such as `m5_challenger`):
 
 ```sh
 python3 league/run.py --bot equity_precise --opp all --seeds 3 --deals 200 --out /tmp/equity-precise-screen.csv
 ```
 
-Candidate names are `equity_core`, `equity_guarded`, `equity_pressure`, `equity_precise`, and `bayes_adaptive`. Use the same seed range for every candidate, then confirm leaders with the official HTTP judge. For example:
+Candidate names are `equity_core`, `equity_guarded`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, and `bayes_ev`. The last policy uses a Dirichlet-smoothed model of fold/call/raise responses to our bets. Its 57-match screen showed no runtime errors but lost to the M1 and guarded policies; treat it as a research benchmark, not a default. Use the same seed range for every candidate, then confirm promising leaders with the official HTTP judge. For example:
 
 ```sh
 python3 tools/run_datathon_match.py --bot equity_guarded --opponent-bot m1_equity --seed 711 --seeds 10 --deals 1000

@@ -28,7 +28,7 @@ def main():
         table[key] = round((table[key] * 100 + score) / 350, 6)
         if index % 1000 == 0:
             print(index, "/", len(keys), flush=True)
-    with open("/tmp/m6_preflop.json", "w") as output:
+    with open("/tmp/m5_counterplay_preflop.json", "w") as output:
         json.dump(table, output, separators=(",", ":"))
     print("complete", flush=True)
 
