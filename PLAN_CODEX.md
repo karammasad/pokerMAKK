@@ -4,7 +4,7 @@ You are setting up and building our team's bot for the TAMU Datathon Heads Up Po
 (Short Deck 5-card PLO, heads-up). Work through the phases in order. After each phase, run the
 checks listed, commit, and push. Do not skip checks. If a check fails, fix it before moving on.
 
-Our GitHub repo: `pokerMAKK` (remote URL: `<PASTE https://github.com/<user>/pokerMAKK.git>`)
+Our GitHub repo: `pokerMAKK` (remote URL: `https://github.com/karammasad/pokerMAKK.git`)
 Starter code: https://github.com/tamu-datathon-org/heads-up-bundle
 
 ---
@@ -280,3 +280,28 @@ Each person opens pokerMAKK in Codex or Claude Code after Phase 1 is pushed and 
 > 3 seeds, append to league/results.csv, run pytest, then commit and push to a branch named <name>-mN.
 
 Merge to main only through the adoption rule.
+
+
+---
+
+## Implementation status (2026-11-07)
+
+- Starter `heads-up-bundle` merged from `upstream/main`; the original starter runtime files are preserved except for the required participant identity and the marked bot forwarding section in `agent.py`.
+- Phase 1 infrastructure is present: `bots/common/{safe,cards,equity,timing}.py`, `league/run.py`, zoo opponents, and the safety, fuzz, and league tests.
+- Method 1 is active. Its suit-canonical preflop table has 19,998 entries, generated with 100 samples per hand. The equity estimator uses deterministic, cached Monte Carlo evaluations through `evaluator.omaha_score`.
+- Method 2 has a trained 150-state, coarse regret-matching table. Its trainer solves abstract one-street payoff states as a warm start; it is not a full-game MCCFR solution yet.
+- Method 3 has per-half opponent statistics, archetype rules, conservative exploits, and a base-strategy reversion guard. It remains experimental.
+- Method 4 has feature generation and NumPy training code. A 20,000-state experiment produced held-out MAE above 0.14, so the runtime rejects the model and falls back to Method 1 until a model meets the 0.05 MAE gate.
+- `league/psro.py` reads payoff results and calculates a simple population mixture. It needs complete payoff data for each candidate before its mixture is meaningful.
+
+### Checks completed
+
+- `python3 -m pytest -q`: 16 passed.
+- `python3 tools/smoke_test.py --port 5008`: passed; all five sample decisions were legal and returned in 1–4 ms.
+- Startup: about 0.4 seconds on the development machine.
+- Real HTTP duplicate matches: Method 1 won all three 1,000-deal seeds against each starter baseline, with zero errors.
+- In-process league: Method 1 won all three 1,000-deal seeds against each of the nine zoo opponents, with zero errors and fallbacks. Targeted timing runs measured each half at 2.19–2.38 seconds worst-case and p99 decisions below 1.2 ms.
+- Methods 2–4 passed 5,000-state legal-action fuzzing and short all-zoo league smoke runs with zero errors. These short runs are not adoption evidence.
+- `./tools/check_build.sh` could not complete: Docker Desktop first failed while extracting the PyTorch base image with a disk I/O error, then stopped answering `docker info`. Direct server smoke tests passed. Retry the Docker check after Docker Desktop is healthy.
+
+The first HTTP baseline batch left nine mislabeled rows in `league/results.csv`; `league/results_notes.md` identifies those append-only rows and the corrected rerun.
