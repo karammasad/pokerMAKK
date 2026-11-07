@@ -2,6 +2,8 @@
 
 Example:
   python3 tools/run_datathon_match.py --opponent baseline_random --seed 7 --deals 1000
+  python3 tools/run_datathon_match.py --opponent-script /path/to/other/agent.py \
+      --opponent-name other_team --seed 7 --deals 1000
 """
 import argparse
 import csv
@@ -52,14 +54,24 @@ def stop(process):
             process.wait(timeout=5)
 
 
-def play_half(half, opponent, seed, deals, agent_port, opp_port, outdir):
+def play_half(half, opponent, opponent_label, seed, deals, agent_port, opp_port, outdir):
     env_agent = os.environ.copy()
     env_agent["PORT"] = str(agent_port)
     env_opp = os.environ.copy()
     env_opp["PORT"] = str(opp_port)
+    env_opp["PYTHONPATH"] = os.pathsep.join(
+        item for item in (str(ROOT), env_opp.get("PYTHONPATH", "")) if item
+    )
     agent = subprocess.Popen([sys.executable, "agent.py"], cwd=ROOT, env=env_agent,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    opp = subprocess.Popen([sys.executable, f"baseline-bots/{opponent}.py"], cwd=ROOT, env=env_opp,
+    if opponent.startswith("script:"):
+        opponent_script = Path(opponent.removeprefix("script:")).expanduser().resolve()
+        opponent_cmd = [sys.executable, str(opponent_script)]
+        opponent_cwd = opponent_script.parent
+    else:
+        opponent_cmd = [sys.executable, f"baseline-bots/{opponent}.py"]
+        opponent_cwd = ROOT
+    opp = subprocess.Popen(opponent_cmd, cwd=opponent_cwd, env=env_opp,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     path = outdir / f"half{half}.json"
     try:
@@ -69,7 +81,7 @@ def play_half(half, opponent, seed, deals, agent_port, opp_port, outdir):
             "baseline_calling_station": "CallingStation",
             "baseline_always_half": "AlwaysHalf",
             "baseline_always_pot": "AlwaysPot",
-        }[opponent]
+        }.get(opponent, opponent_label)
         wait_for_server(opp_port, expected, opp)
         result = subprocess.run([
             sys.executable, "judge_engine.py", "--half", str(half),
@@ -93,7 +105,7 @@ def append_league_result(opponent, seed, deals, match_result):
     stats = match_result["agent_stats"]["agent1"]
     verdict = {"AGENT1_WIN": "win", "AGENT2_WIN": "loss", "CHOP": "chop"}.get(match_result["verdict"], match_result["verdict"].lower())
     row = {
-        "bot": "m1_equity", "opponent": opponent.removeprefix("baseline_"), "seed": seed, "deals": deals,
+        "bot": "m1_equity", "opponent": opponent.removeprefix("baseline_").removeprefix("script:"), "seed": seed, "deals": deals,
         "bb_deal": match_result["mean_bb_per_deal"], "ci_low": match_result["ci"][0], "ci_high": match_result["ci"][1],
         "verdict": verdict, "errors": sum(item["errors"] for item in stats), "fallbacks": "",
         "think_s": max(item["time_seconds"] for item in stats), "p50_ms": "", "p99_ms": "",
@@ -106,13 +118,26 @@ def append_league_result(opponent, seed, deals, match_result):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--opponent", choices=(*BASELINES, "all"), default="baseline_random")
+    opponent_group = parser.add_mutually_exclusive_group()
+    opponent_group.add_argument("--opponent", choices=(*BASELINES, "all"), default="baseline_random")
+    opponent_group.add_argument("--opponent-script", help="path to a compatible opponent Python server script")
+    parser.add_argument("--opponent-name", help="label and / health-check agent_name for --opponent-script")
     parser.add_argument("--seed", default="7", help="first reproducible match seed")
     parser.add_argument("--seeds", type=int, default=1, help="number of sequential seeds to run")
     parser.add_argument("--deals", type=int, default=1000)
     parser.add_argument("--outdir", default="/tmp/pokerMAKK-datathon")
     args = parser.parse_args()
-    opponents = BASELINES if args.opponent == "all" else (args.opponent,)
+    if args.opponent_script:
+        if not args.opponent_name:
+            parser.error("--opponent-name is required with --opponent-script; it must match GET / agent_name")
+        script = Path(args.opponent_script).expanduser().resolve()
+        if not script.is_file():
+            parser.error(f"opponent script does not exist: {script}")
+        opponents = (f"script:{script}",)
+        labels = {opponents[0]: args.opponent_name}
+    else:
+        opponents = BASELINES if args.opponent == "all" else (args.opponent,)
+        labels = {}
     root_outdir = Path(args.outdir)
     root_outdir.mkdir(parents=True, exist_ok=True)
     agent_port, opp_port = free_port(), free_port()
@@ -126,10 +151,16 @@ def main():
                 seed = str(int(args.seed) + seed_index)
             else:
                 seed = f"{args.seed}-{seed_index}"
-            outdir = root_outdir / f"{opponent}-seed-{seed}"
+            output_label = labels.get(opponent, opponent).replace("/", "_").replace(":", "_")
+            outdir = root_outdir / f"{output_label}-seed-{seed}"
             outdir.mkdir(parents=True, exist_ok=True)
             halves = [
-                play_half(h, opponent, seed, args.deals, agent_port, opp_port, outdir)
+                play_half(h, opponent, labels.get(opponent, {
+                    "baseline_random": "RandomBot",
+                    "baseline_calling_station": "CallingStation",
+                    "baseline_always_half": "AlwaysHalf",
+                    "baseline_always_pot": "AlwaysPot",
+                }.get(opponent, opponent)), seed, args.deals, agent_port, opp_port, outdir)
                 for h in (1, 2)
             ]
             combined = outdir / "match.json"
@@ -138,7 +169,7 @@ def main():
             if result.returncode:
                 raise SystemExit(result.stdout + result.stderr)
             match_result = json.loads(combined.read_text())
-            append_league_result(opponent, seed, args.deals, match_result)
+            append_league_result(labels.get(opponent, opponent), seed, args.deals, match_result)
             print(result.stdout.strip())
             print(f"Saved halves and combined result under {outdir}; appended to league/results.csv")
 

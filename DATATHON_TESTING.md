@@ -39,9 +39,24 @@ It saves each half and the combined judge result under `/tmp/pokerMAKK-datathon/
 
 The latest fresh-server validation (seed 7–9, 1,000 deals each) won all 12 matches against the four starter baselines with zero errors. The slowest thinking half was 1.25 seconds.
 
-The helper accepts `baseline_random`, `baseline_calling_station`, `baseline_always_half`, and `baseline_always_pot`. Run other submitted bots as HTTP servers and point `judge_engine.py` at their ports, or add them to the helper's allowlist.
+## 4. Test a shared/organizer bot
 
-## 4. Build and submission checks
+The participant guide describes a round-robin tournament but does not publish other teams' bot code or an opponent endpoint. Ask the organizers whether they can provide a sample opponent package or a local runnable bot; teams can also share a copy of their entry. The other bot must be run with the same protocol/dependencies as this bundle. Do not assume a live tournament endpoint is available: tournament containers have no outside network access.
+
+If you receive a compatible Python server script, run it as a second process for each half with:
+
+```sh
+python3 tools/run_datathon_match.py \
+  --opponent-script /absolute/path/to/other_team/agent.py \
+  --opponent-name OtherTeamBot \
+  --seed 7 --seeds 10 --deals 1000
+```
+
+`--opponent-name` must match the opponent's `GET /` JSON `agent_name`. The runner launches fresh processes for each half, uses the official local judge on identical duplicate deals, combines the halves, and records the results. `--seeds 10` gives ten reproducible paired matches; each match uses the same seed for both seats. If the bot needs extra packages, install them in the active Python environment first. For a Docker-only bot, start its HTTP server on the assigned `PORT` yourself and use the judge directly (`python3 judge_engine.py --half 1 --agent1 5008 --agent2 5011 --seed 7 --deals 1000`), then restart both servers and repeat with `--half 2`; combine the JSON files with `python3 judge_engine.py combine half1.json half2.json`.
+
+Start with 100–200 deals to catch protocol, import, and illegal-action problems. Then use at least 10 seeds at the full 1,000 deals per half and compare mean bb/deal, confidence intervals, forfeits, errors, and time bank. Keep actual submitted bots in a separate result group from the four toy baselines.
+
+## 5. Build and submission checks
 
 ```sh
 ./tools/check_build.sh
