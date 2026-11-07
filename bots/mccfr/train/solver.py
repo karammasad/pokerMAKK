@@ -3,9 +3,10 @@
 The tree transitions and terminal utilities are exact. Chance is sampled by
 deal; opponent actions are sampled from the current regret-matching policy;
 the traverser's actions are enumerated. The information-state abstraction
-groups cards by equity/pot-odds/SRP buckets and compresses bet history to
-action labels. It is imperfect recall and is a research prototype, not an
-equilibrium guarantee for the unabstracted tournament game.
+groups cards by equity/pot-odds/SRP buckets and can either compress public
+history to action counts or preserve the ordered action sequence. Card
+abstraction remains imperfect recall in both modes, so this is a research
+prototype, not an equilibrium guarantee for the unabstracted tournament game.
 """
 import argparse
 from copy import deepcopy
@@ -19,13 +20,14 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 import game
 from game import Action
-from bots.mccfr.core import info_key, policy_from_regret
+from bots.mccfr.core import info_key, info_key_sequence, policy_from_regret
 from evaluator import warmup
 
 
 class Solver:
-    def __init__(self, seed, node_limit):
+    def __init__(self, seed, node_limit, info_key_fn=info_key):
         self.rng = random.Random(seed)
+        self.info_key_fn = info_key_fn
         self.nodes = {}
         self.node_limit = node_limit
         self.visited = 0
@@ -70,7 +72,7 @@ class Solver:
         player = state.to_act
         obs = state.observation(player)
         legal = obs.legal_actions
-        key = info_key(obs)
+        key = self.info_key_fn(obs)
         entry = self._entry(key)
         strategy = policy_from_regret(entry["regrets"], legal)
         if player != traverser:
@@ -113,12 +115,15 @@ def main():
     parser.add_argument("--seed", default="mccfrplus-v1")
     parser.add_argument("--node-limit", type=int, default=30000,
                         help="maximum traversed decision nodes per player walk")
+    parser.add_argument("--history-abstraction", choices=("compact", "sequence"), default="compact",
+                        help="merge histories by action counts, or preserve the ordered public action sequence")
     parser.add_argument("--out", default=str(Path(__file__).parents[1] / "tables" / "strategy.json"))
     args = parser.parse_args()
     if args.iterations < 1 or args.node_limit < 1:
         parser.error("--iterations and --node-limit must be positive")
     warmup()
-    solver = Solver(args.seed, args.node_limit)
+    key_fn = info_key if args.history_abstraction == "compact" else info_key_sequence
+    solver = Solver(args.seed, args.node_limit, key_fn)
     started = time.perf_counter()
     for i in range(args.iterations):
         solver.iteration(i, args.seed)
@@ -139,7 +144,7 @@ def main():
     output.write_text(json.dumps({"metadata": {
         "algorithm": "external-sampling MCCFR+", "iterations": args.iterations,
         "seed": str(args.seed), "node_limit_per_walk": args.node_limit,
-        "abstraction": "equity/pot-odds/SRP buckets with action-history labels (imperfect recall)",
+        "abstraction": f"equity/pot-odds/SRP buckets with {args.history_abstraction} public action history (imperfect card recall)",
         "training_seconds": round(time.perf_counter() - started, 3),
     }, "infosets": policy}, separators=(",", ":")))
     print(f"saved {len(policy)} infosets to {output}; elapsed={time.perf_counter()-started:.1f}s")

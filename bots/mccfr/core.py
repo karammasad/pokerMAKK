@@ -1,5 +1,6 @@
 """Shared information-state abstraction for MCCFR+ training and runtime."""
 import json
+import math
 from bots.common.cards import canonical_suits
 from bots.common.equity import equity_vs_random
 from game import Action, Street
@@ -46,6 +47,21 @@ def info_key(obs):
     history = tuple(counts.get((street, is_me, action), 0)
                     for street in range(4) for is_me in range(2) for action in range(3))
     legal_mask = sum(1 << int(action) for action in obs.legal_actions)
+    return json.dumps((obs.street.name, ebin, obin, sprbin, int(obs.is_button),
+                       obs.raises_this_street, legal_mask, history), separators=(",", ":"))
+
+
+def info_key_sequence(obs):
+    """Use ordered public action history instead of merging sequences by counts."""
+    ebin = min(9, int(equity(obs) * 10))
+    pot_odds = obs.to_call / max(1, obs.pot + obs.to_call)
+    obin = min(7, int(pot_odds * 8))
+    spr = obs.my_stack / max(1, obs.pot)
+    sprbin = min(7, int(spr * 2))
+    legal_mask = sum(1 << int(action) for action in obs.legal_actions)
+    history = tuple((int(record.street), int(record.is_me), int(record.action),
+                     min(7, int(math.log2(max(1, record.street_total)))))
+                    for record in obs.action_history)
     return json.dumps((obs.street.name, ebin, obin, sprbin, int(obs.is_button),
                        obs.raises_this_street, legal_mask, history), separators=(",", ":"))
 
