@@ -13,3 +13,9 @@ Two short development-only protocol-smoke matches (`candidate-smoke` and `replay
 `tools/run_datathon_match.py` appends future fresh-server match summaries automatically. It writes LF-terminated CSV rows so `git diff --check` remains clean.
 
 On 2026-11-07, CSV lines 126–128 record an initial river-bluff-only version of `m5_challenger`; lines 129–158 use the later version that also folds marginal postflop calls. These rows therefore do not describe the same strategy. Lines 129–131 are development seeds, as are the zoo seeds 0–2. Later head-to-head rows use the latter version; seeds 3 and 4 were held out from those initial trials.
+
+M6 development runs are identified by CSV line numbers: 282–284 used loose pressure and baseline calls; 285–287 added tighter calls; 288–290 also reduced thin raises; 291–293 narrowed pressure; 294–296 used 64 postflop samples; 297–299 added a refined preflop table; 300–302 opened a wider button range; 303–305 tested pot-sized pressure; 306–312 used tighter postflop responses with 64 samples. The latter batch was interrupted after the first Method 2 match exceeded the four-second target. Starting at line 313 the candidate uses 48 postflop samples. Seeds 0–2 in these runs were used for development and are not held-out evaluation.
+
+The final M6 candidate's expanded zoo run starts at line 316, followed by the four original methods and a ten-seed M5 batch at lines 373–382. Seeds 0–2 were used for tuning; M5 seeds 3–9 are held out. Lines 383–386 are separate fresh-server HTTP matches against M5, with seeds 11–14. M6's table refines 7,071 near-threshold hands with 250 additional independent simulations per hand, combined with the original 100-sample estimates; other hands retain the original table values.
+
+The strategy recorded as `m6_counter` above was renamed `m5_counterplay` before integration to distinguish it from other M6 work. The rows retain their original labels.
