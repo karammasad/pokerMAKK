@@ -82,7 +82,7 @@ AGENTS.md
 PLAN_CODEX.md
 bots/
   __init__.py
-  active.py               # ACTIVE_BOT = "m1_equity"
+  active.py               # default ACTIVE_BOT = "equity_guarded"
   common/
     __init__.py
     safe.py               # safety wrapper
@@ -125,7 +125,7 @@ def new_half(config, memory): _BOT.new_half(config, memory)
 def choose_action(obs, memory): return _BOT.choose_action(obs, memory)
 def on_hand_end(result, memory): _BOT.on_hand_end(result, memory)
 ```
-`get_bot()` reads `ACTIVE_BOT`, imports `bots.<name>.bot`, calls its optional `load()` and returns `safe.wrap(...)`.
+`get_bot()` reads the `POKER_BOT` override or defaults to `equity_guarded`; it builds portfolio candidates or imports a bot module, then returns `safe.wrap(...)`.
 
 ### 4.3 `league/run.py` (in-process duplicate league)
 - Uses `game.make_deal(seed, i)`, `game.button_for_deal(i)`, `game.Game(deal, button_seat, hand_index)`,
@@ -288,7 +288,7 @@ Merge to main only through the adoption rule.
 
 - Starter `heads-up-bundle` merged from `upstream/main`; the original starter runtime files are preserved except for the required participant identity and the marked bot forwarding section in `agent.py`.
 - Phase 1 infrastructure is present: `bots/common/{safe,cards,equity,timing}.py`, `league/run.py`, zoo opponents, and the safety, fuzz, and league tests.
-- Method 1 is active. Its suit-canonical preflop table has 19,998 entries, generated with 100 samples per hand. The equity estimator uses deterministic, cached Monte Carlo evaluations through `evaluator.omaha_score`.
+- `equity_guarded` is now the default strategy. It uses the validated Method 1 equity core with more conservative value/call thresholds; `m1_equity` remains the incumbent comparison. The suit-canonical preflop table has 19,998 entries, generated with 100 samples per hand.
 - Method 2 has a trained 150-state, coarse regret-matching table. Its trainer solves abstract one-street payoff states as a warm start; it is not a full-game MCCFR solution yet.
 - Method 3 has per-half opponent statistics, archetype rules, conservative exploits, and a base-strategy reversion guard. It remains experimental.
 - Method 4 has feature generation and NumPy training code. A 20,000-state experiment produced held-out MAE above 0.14, so the runtime rejects the model and falls back to Method 1 until a model meets the 0.05 MAE gate.
@@ -296,7 +296,7 @@ Merge to main only through the adoption rule.
 
 ### Checks completed
 
-- `python3 -m pytest -q`: 27 passed, 1 optional HTTP test skipped; `RUN_HTTP_MATCH_TESTS=1 python3 -m pytest -q tests/test_datathon_http.py`: 1 passed.
+- `python3 -m pytest -q`: 27 passed, 1 optional HTTP test skipped; `RUN_HTTP_MATCH_TESTS=1 python3 -m pytest -q tests/test_datathon_http.py`: 1 passed. The expanded corpus now checks the portfolio and trained MCCFR+ policy too.
 - `python3 tools/smoke_test.py --port 5008`: passed; all five sample decisions were legal and returned in 1–4 ms.
 - Startup: about 0.4 seconds on the development machine.
 - Fresh-server real HTTP duplicate matches after suit-canonical equity changes: Method 1 won all 12 matches (four starter baselines × seeds 7–9, 1,000 deals each), with zero errors; slowest thinking half 1.25 seconds.
@@ -308,3 +308,6 @@ Merge to main only through the adoption rule.
 The first HTTP baseline batch left nine mislabeled rows in `league/results.csv`; `league/results_notes.md` identifies those append-only rows and the corrected rerun.
 - Added a stratified 12,000-observation regression corpus, academic research roadmap, and fresh-server Datathon test instructions in `RESEARCH_ROADMAP.md` and `DATATHON_TESTING.md`.
 - Latest fresh-server official-judge validation: 12 wins (four starter baselines × three 1,000-deal seeds), zero errors, slowest half 1.25 seconds.
+- Candidate search: `equity_guarded` beat `m1_equity` on 10/10 fresh-server matches of 1,000 duplicate deals, +0.901 bb/deal (95% CI [+0.759, +1.043]), zero errors, maximum half think time 1.151 seconds. It also won all 12 fresh-server starter-baseline matches and all 27 1,000-deal in-process zoo runs.
+- `equity_pressure` was rejected after a 10-match full-length fresh-server head-to-head versus `m1_equity`: -0.721 bb/deal (95% CI [-0.869, -0.572]), 0/10 wins, one chop.
+- Added an external-sampling MCCFR+ training prototype with an imperfect-recall abstraction. Its 5,000-iteration policy (121,306 infosets) lost to `m1_equity` on three held-out 200-deal seeds by -5.47 bb/deal on average; it remains research-only. `tools/view_match.py` creates an interactive replay from judge logs.

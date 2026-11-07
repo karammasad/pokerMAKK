@@ -40,7 +40,7 @@ warmup()
 
 # rename as your team/bot's name
 PARTICIPANT = "pokerMAKK"
-AGENT_NAME = "MAKK"
+AGENT_NAME = os.environ.get("POKER_BOT", "MAKK")
 
 
 # ===== YOUR CODE HERE =====

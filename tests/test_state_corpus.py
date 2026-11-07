@@ -7,17 +7,21 @@ from pathlib import Path
 import game
 from bots.common.safe import wrap
 from league.zoo.simple import factory
+from bots.portfolio import factory as portfolio_factory, names as portfolio_names
 
 ROOT = Path(__file__).resolve().parent
-BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "random", "calling_station",
-             "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise")
+BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "mccfr",
+             *portfolio_names(), "random", "calling_station", "always_half", "always_pot",
+             "nit", "loose_passive", "maniac", "shover", "fold_to_raise")
 
 
 def make_bots():
     bots = {}
     memories = {}
     for name in BOT_NAMES:
-        if name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger"}:
+        if name in portfolio_names():
+            module = portfolio_factory(name)
+        elif name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "mccfr"}:
             module = importlib.import_module(f"bots.{name}.bot")
             load = getattr(module, "load", None)
             if load:
