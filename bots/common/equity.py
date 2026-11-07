@@ -19,10 +19,13 @@ def _cached(hole, board, samples):
     missing = 5 - len(board)
     rng = random.Random(_seed(hole, board))
     score = 0.0
+    # On the river only the opponent's cards vary. Our score is identical in
+    # every sample; preserve draws and their order so estimates remain exact.
+    river_score = omaha_score(hole, board) if missing == 0 else None
     for _ in range(samples):
         draw = rng.sample(unseen, 5 + missing)
         full_board = tuple(board) + tuple(draw[5:])
-        a = omaha_score(hole, full_board)
+        a = river_score if river_score is not None else omaha_score(hole, full_board)
         b = omaha_score(tuple(draw[:5]), full_board)
         score += 1.0 if a > b else 0.5 if a == b else 0.0
     return score / samples if samples else 0.5

@@ -13,12 +13,15 @@ import game
 from game import Action, AgentConfig
 from bots.common.safe import wrap
 from league.zoo.simple import factory
+from league.zoo.equity import POLICIES, factory as equity_factory
 
-ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise"]
+ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise", *POLICIES, "m1_reference"]
 
 
 def load_bot(name):
-    if name in ZOO:
+    if name in POLICIES:
+        return equity_factory(name)
+    if name in ZOO and name != "m1_reference":
         return factory(name)
     mod = importlib.import_module(f"bots.{name}.bot")
     hook = getattr(mod, "load", None)

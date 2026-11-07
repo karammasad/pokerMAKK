@@ -8,7 +8,7 @@ from game import Action, Street
 
 
 _PREFLOP = None
-_PARAMS = {"value_pot": 0.76, "value_half": 0.63, "margin": 0.04, "bluff_freq": 0.0}
+_PARAMS = {"value_pot": 0.82, "value_half": 0.70, "margin": 0.10, "bluff_freq": 0.0}
 
 
 def load():
@@ -26,6 +26,8 @@ def load():
 
 def new_half(config, memory):
     memory["hands_played"] = 0
+    memory["_m1_equities"] = {}
+    memory["_m1_hand"] = None
 
 
 def estimate_equity(obs, budget_s=None, max_samples=32):
@@ -34,6 +36,24 @@ def estimate_equity(obs, budget_s=None, max_samples=32):
 
 def choose_action(obs, memory):
     legal = obs.legal_actions
+    # All-in responses and capped streets can have just one legal action.
+    if len(legal) == 1:
+        return legal[0]
+    # A repeat betting decision on the same street has the same random-range
+    # equity. Keep only the current hand, and reset through new_half.
+    if memory.get("_m1_hand") != obs.hand_index:
+        memory["_m1_hand"] = obs.hand_index
+        memory["_m1_equities"] = {}
+    cache = memory.setdefault("_m1_equities", {})
+    state = (tuple(obs.hole_cards), tuple(obs.board))
+    equity = cache.get(state)
+    if equity is None:
+        equity = _equity(obs)
+        cache[state] = equity
+    return _choose_with_equity(obs, equity)
+
+
+def _equity(obs):
     if obs.street == Street.PREFLOP:
         equity = None
         if _PREFLOP:
@@ -51,6 +71,11 @@ def choose_action(obs, memory):
             equity = min(0.74, max(0.24, strength))
     else:
         equity = estimate_equity(obs)
+    return equity
+
+
+def _choose_with_equity(obs, equity):
+    legal = obs.legal_actions
     odds = obs.to_call / max(1, obs.pot + obs.to_call)
     if obs.street == Street.RIVER and obs.to_call == 0 and Action.RAISE_HALF in legal:
         checked_to = any(not record.is_me and record.street == Street.RIVER and
