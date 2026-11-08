@@ -47,7 +47,7 @@ The local league can screen the six portfolio candidates against all nine practi
 python3 league/run.py --bot equity_precise --opp all --seeds 3 --deals 200 --out /tmp/equity-precise-screen.csv
 ```
 
-Candidate names are `equity_core`, `equity_guarded`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, and `bayes_ev`. The last policy uses a Dirichlet-smoothed model of fold/call/raise responses to our bets. Its 57-match screen showed no runtime errors but lost to the M1 and guarded policies; treat it as a research benchmark, not a default. Use the same seed range for every candidate, then confirm promising leaders with the official HTTP judge. For example:
+Portfolio names are `equity_core`, `equity_guarded`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, and `bayes_ev`. Other candidates in the comparison pool are `m1_equity`, `m2_cfr`, `m3_exploit`, `m4_learned`, `m5_challenger`, and research experiments `m6_safeadapt` through `m11_chosen`, plus `m5_counterplay`. M6, M8, M9, and M10 trail M5 in current screens; M7's official holdout is inconclusive. M9/M10 are CFR+ research policies whose local abstractions do not inherit full-game guarantees. Use the same seed range for every candidate, then confirm promising leaders with the official HTTP judge. For example:
 
 ```sh
 python3 tools/run_datathon_match.py --bot equity_guarded --opponent-bot m1_equity --seed 711 --seeds 10 --deals 1000
@@ -101,3 +101,7 @@ This is the same Docker build and restricted-container smoke check used by the s
 ## What a match result means
 
 A single half is mostly card luck. The judge keeps the same deals and swaps seats for the second half, then reports the mean big blinds per deal and a 95% confidence interval. Above zero is a win, below zero is a loss, and an interval touching zero is a chop. A five-error half is a forfeit. Track errors, timeouts, and decision time along with chip results.
+
+For stable runnable IDs, readable names, and teammate naming guidance, see [BOT_CATALOG.md](BOT_CATALOG.md).
+
+To use an untouched range for the in-process screen, add `--seed-start 900 --seeds 3`. Match the same opponents, deal counts, and seeds when comparing candidates, and use different seeds for selection and final confirmation.

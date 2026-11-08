@@ -42,6 +42,20 @@ There is no defensible way to promise an “absolute” winner against unknown s
 
 The 57-match `bayes_ev` screen (three paired seeds × 200 deals against 19 practice, baseline, and portfolio opponents) averaged +4.070 bb/deal overall and made no errors or fallbacks. It averaged +1.00 bb/deal against the nine toy styles, but lost on all three seeds to `m1_equity` (−1.728 bb/deal) and `equity_guarded` (−2.462 bb/deal). Against the newly added `m5_challenger`, its three-seed mean was −1.478 bb/deal. Keep it as a benchmark and do not promote it. Raw results are in [`league/benchmarks/bayes_ev_screen.csv`](league/benchmarks/bayes_ev_screen.csv). The large overall mean is dominated by weak toy opponents and is not a measure of tournament strength.
 
+### Next research challengers
+
+`m6_safeadapt` keeps M5 as its anchor and uses a posterior lower bound to suppress weak river bluffs only when observed responses make them look unprofitable; it also adjusts marginal calls after sustained aggression. This is a small adaptation experiment inspired by [SafeAdapt-Poker](https://arxiv.org/abs/2610.20473), not a reproduction. It lost to M5 by 0.221 bb/deal on five 1,000-deal paired seeds.
+
+`m7_precision` uses 32 equity samples normally and refines to 96 near an action threshold, while preserving M5's decisions. It gained +0.291 bb/deal against M5 in a 10,000-deal in-process screen, but the independent fresh-server holdout was only +0.049 bb/deal (95% CI [−0.096, +0.194]). Keep it in the pool; evidence does not justify promotion yet. Raw screens are in [`league/benchmarks/m7_precision_screen.csv`](league/benchmarks/m7_precision_screen.csv), with official rows in `league/results.csv`.
+
+`m8_bayes_types` maintains a recent-window Bayesian posterior over four public-action behavior types, following the strategy-posterior idea in [Bayes' Bluff](https://arxiv.org/abs/1207.1411). Its hand-coded likelihoods are an explicit abstraction. It lost to M5 by 0.041 bb/deal on 10,000 in-process paired deals (95% CI [−0.069, −0.012]); keep it as a comparison policy.
+
+`m9_cfrplus` is a separate 20,000-iteration external-sampling MCCFR+ strategy with an M5 fallback. It lost to M5 by 3.088 bb/deal on 10,000 paired deals (95% CI [−3.431, −2.745]); a 50-visit fallback cutoff improved the five-seed tuning mean to −1.087 bb/deal, then lost by −0.826 bb/deal on five separate holdout seeds (95% CI [−1.220, −0.433]). The table is gzip-compressed at `bots/m9_cfrplus/tables/strategy.json.gz` and kept as a negative research result.
+
+`m10_seq_cfr` trains the same CFR+ traversal for 10,000 iterations while preserving the ordered public action sequence in each information key. It lost to M5 by 4.291 bb/deal on 10,000 paired deals (95% CI [−4.646, −3.935]). This indicates that action-order preservation alone does not repair the current card abstraction or training setup. The 145,580-infoset table is kept as a reproducible comparison, not an adoption candidate.
+
+The candidate pool in `league/run.py` includes M6–M10 so `--opp all` compares future models against the full research set. CFR+ has strong poker results in solved or much smaller abstractions, but these local imperfect-recall policies do not inherit those guarantees.
+
 The repo also has an external-sampling MCCFR+ trainer over the official sequential betting game. It uses an explicit imperfect-recall abstraction, so full-game MCCFR convergence guarantees do not transfer to this prototype. Its 5,000-iteration policy covered 121,306 infosets (about 13 MB) and lost to `m1_equity` on three held-out 200-deal seeds, averaging **−5.47 bb/deal**. It remains research-only.
 
 ### Tournament evidence to date
@@ -49,3 +63,9 @@ The repo also has an external-sampling MCCFR+ trainer over the official sequenti
 - A 200-deal screen across three seeds and 18 practice/incumbent/candidate opponents ranked `equity_pressure` first by average points, but longer head-to-head tests overturned that ranking. On 10 fresh-server matches × 1,000 duplicate deals against `m1_equity`, it lost 9 and chopped 1: **−0.721 bb/deal**, 95% CI **[−0.869, −0.572]**, zero errors.
 - `equity_guarded` won all 10 fresh-server 1,000-deal duplicate matches against `m1_equity`: **+0.901 bb/deal**, 95% CI **[+0.759, +1.043]**, zero errors, maximum half think time 1.151 seconds.
 - It also won all 12 official fresh-server matches against the four starter baselines and all 27 in-process 1,000-deal runs against the nine-style practice zoo, with zero errors/fallbacks. These are baseline/zoo results; no submitted team bots were available.
+
+### M11 pressure hybrid
+
+`m11_chosen` combines M5's preflop decisions with the team's `m5_counterplay` postflop policy. This is a heuristic hybrid, not a solved or research-grade equilibrium. On three in-process paired seeds of 500 deals each (800–802), it averaged +0.293 bb/deal against M5, +0.040 against M5 counterplay, +0.189 against M7, +1.603 against equity_guarded and +2.147 against M1. These small screens are exploratory; raw rows, including calling station and maniac, are in `league/benchmarks/m11_chosen_screen.csv`.
+
+In fresh-server official judge holdouts, M11 beat M5 on all ten 1,000-deal seeds 820–829, averaging +0.872 bb/deal (pooled 95% CI [+0.721, +1.023]). Against M5 counterplay on five 1,000-deal seeds 840–844 it averaged +0.013 bb/deal (95% CI [−0.044, +0.071]); all five matches were chops. Both sets reported zero errors. Official rows are recorded in `league/results.csv`. This is strong evidence against M5, not proof of strength against unknown entrants. Keep M5 as the entry default until M11 completes a broader official opponent and runtime evaluation.
