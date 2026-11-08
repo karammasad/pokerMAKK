@@ -23,7 +23,7 @@ RESEARCH_CANDIDATES = PORTFOLIO + [
     "m5_counterplay", "m5_classic", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin",
     "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr",
     "m11_chosen", "mccfr", "rangefinder", "m1_team_tuned", "m1_reference", "rook_fast", "kestrel",
-    "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish",
+    "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish", "osprey",
 ]
 
 
