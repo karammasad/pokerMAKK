@@ -7,6 +7,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Anchor | `m5_challenger` | Equity strategy with selective folds and river bluffs | Current entry default |
 | Talon | `m5_counterplay` | Refined preflop table and pressure-oriented postflop policy | Team comparison candidate |
 | Rook | `m11_chosen` | Anchor preflop and Talon postflop | Comparison candidate |
+| Rangefinder | `rangefinder` | M5-derived policy with confidence-shrunk showdown range updates | Research challenger |
 | Lens | `m7_precision` | Anchor with selective extra equity sampling | Comparison candidate |
 | Guard | `equity_guarded` | Guarded equity portfolio policy | Comparison candidate |
 | Scout | `m1_equity` | Original equity policy | Baseline |
