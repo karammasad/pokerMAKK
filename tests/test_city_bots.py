@@ -2,7 +2,8 @@ import pytest
 
 from league import run
 
-CITY = ["haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish"]
+CITY = ["haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish",
+        "doku", "stones", "akanji", "ederson", "mahrez", "gundogan"]
 
 
 @pytest.mark.parametrize("name", CITY)

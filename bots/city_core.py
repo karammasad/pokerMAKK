@@ -20,7 +20,7 @@ import game
 from bots.common.cards import canonical_suits
 from bots.common.equity import equity_vs_random
 from bots.m1_equity import bot as base
-from bots.m5_challenger import bot as m5
+from bots.m5_classic import bot as m5
 from bots.m5_counterplay import bot as core
 from game import Action, Street
 
@@ -39,10 +39,14 @@ DEFAULTS = {
     "bluff": 0.0, "bluff_eq_max": 0.25, "bluff_adapt": True, "bluff_pot": False,
     "bluff_any_street": False, "bluff_raise": 0.0, "bluff_raise_band": (0.15, 0.45),
     "slowplay": 0.0, "float": 0.0,
+    # teammate-proven counterplay attacks (gated by measured fold response)
+    "tb_turn": False, "tb_river": False, "tb_flop_mix": False, "tb_gate": True,
+    "open_mix": False, "river_call_margin": None, "station_thin": False,
+    "catch_rate": None,
     # stop-loss (in big blinds, 0 disables) -> switch to SAFE override
     "stop_loss_bb": 0,
 }
-SAFE = {"bluff": 0.0, "bluff_raise": 0.0, "float": 0.0, "slowplay": 0.0, "pre_light": 0.0,
+SAFE = {"tb_river": False, "tb_flop_mix": False, "open_mix": False, "bluff": 0.0, "bluff_raise": 0.0, "float": 0.0, "slowplay": 0.0, "pre_light": 0.0,
         "half_cut": 0.42, "pot_cut": 0.80, "call_margin": 0.32}
 
 
@@ -55,7 +59,8 @@ def new_half(config, memory):
     core.new_half(config, memory)
     m5.new_half(config, memory)
     memory["_city"] = {"hand": -1, "seen": 0, "acts": 0, "raises": 0,
-                       "made": 0, "folded": 0, "pending": False, "net": 0}
+                       "made": 0, "folded": 0, "pending": False, "net": 0,
+                       "tb_trials": 0, "tb_folds": 0, "tb_pending": None}
 
 
 def _draw(obs, salt):
@@ -90,6 +95,17 @@ def _fold_rate(st):
     return (st["folded"] + 2.0) / (st["made"] + 6.0)
 
 
+def _mix(obs):
+    return (obs.hand_index * 31 + sum(card >> 2 for card in obs.hole_cards)) % 4 == 0
+
+
+def _tb_ok(p, st):
+    if not p["tb_gate"]:
+        return True
+    t, f = st["tb_trials"], st["tb_folds"]
+    return t < 12 or (f + 2) / (t + 4) >= 1 / 3
+
+
 def _pick(legal, *prefs):
     for a in prefs:
         if a in legal:
@@ -116,6 +132,8 @@ def _preflop(p, obs, memory, st):
     odds = obs.to_call / max(1, obs.pot + obs.to_call)
     if obs.to_call and eq < odds + p["pre_slack"] and Action.FOLD in legal:
         return Action.FOLD
+    if (p["open_mix"] and opening and eq >= 0.50 and Action.RAISE_HALF in legal and _mix(obs)):
+        return Action.RAISE_HALF
     return Action.CHECK_CALL
 
 
@@ -135,6 +153,9 @@ def _equity(p, obs, memory, thresholds):
 def choose_action(profile, obs, memory):
     st = memory["_city"]
     _observe(obs, st)
+    if st["tb_pending"] == obs.hand_index:
+        st["tb_trials"] += 1  # opponent did not fold: we are deciding again
+        st["tb_pending"] = None
     p = _params(profile, st)
     legal = obs.legal_actions
     if obs.street == Street.PREFLOP:
@@ -145,11 +166,20 @@ def choose_action(profile, obs, memory):
 
     rate = _raise_rate(st)
     aggressive = st["acts"] >= p["min_actions"] and rate >= p["aggro_rate"]
-    if aggressive and p["aggro_mode"] == "m5":
+    if aggressive and (p["aggro_mode"] == "m5" or (p["aggro_mode"] == "hybrid" and rate >= 0.90)):
         return m5.choose_action(obs, memory)
 
     odds = obs.to_call / max(1, obs.pot + obs.to_call)
-    margin = p["call_margin"] - (0.08 if aggressive and p["aggro_mode"] == "calldown" else 0.0)
+    margin = p["call_margin"] - (0.08 if aggressive and p["aggro_mode"] in ("calldown", "hybrid") else 0.0)
+    if (p["catch_rate"] is not None and not aggressive and st["acts"] >= p["min_actions"]
+            and rate >= p["catch_rate"]):
+        margin -= 0.07  # bluff-catcher: opponent raises often but not like a maniac
+    if p["river_call_margin"] is not None and obs.street == Street.RIVER:
+        margin = min(margin, p["river_call_margin"])
+    thin = p["station_thin"] and st["made"] >= 40 and _fold_rate(st) < 0.20
+    if thin:
+        p["half_cut"] -= 0.04
+        p["pot_cut"] -= 0.03
     if obs.to_call:
         thresholds = (p["reraise_cut"], odds + margin)
     else:
@@ -184,7 +214,14 @@ def choose_action(profile, obs, memory):
         return aggress(Action.RAISE_POT)
     if eq >= p["half_cut"] and Action.RAISE_HALF in legal:
         return aggress(Action.RAISE_HALF)
-    if p["bluff"] and eq <= p["bluff_eq_max"] and big in legal:
+    if Action.RAISE_HALF in legal and eq < 0.375 and not thin:
+        eligible = ((obs.street == Street.TURN and p["tb_turn"])
+                    or (obs.street == Street.RIVER and p["tb_river"])
+                    or (obs.street == Street.FLOP and p["tb_flop_mix"] and _mix(obs)))
+        if eligible and _tb_ok(p, st):
+            st["tb_pending"] = obs.hand_index
+            return aggress(Action.RAISE_HALF)
+    if p["bluff"] and eq <= p["bluff_eq_max"] and big in legal and not thin:
         checked_to = any(not r.is_me and r.street == Street.RIVER and r.action == Action.CHECK_CALL
                          for r in obs.action_history)
         spot = (obs.street == Street.RIVER and checked_to) or (
@@ -197,6 +234,11 @@ def choose_action(profile, obs, memory):
 def on_hand_end(profile, result, memory):
     st = memory.get("_city")
     if st is not None:
+        if st["tb_pending"] == result.hand_index:
+            st["tb_trials"] += 1
+            if not result.went_to_showdown and result.winner == "me":
+                st["tb_folds"] += 1
+            st["tb_pending"] = None
         st["net"] += result.my_net
         if st["pending"]:
             st["made"] += 1
