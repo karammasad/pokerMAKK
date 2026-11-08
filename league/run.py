@@ -19,7 +19,7 @@ ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_p
 PORTFOLIO = list(portfolio_names())
 RESEARCH_CANDIDATES = PORTFOLIO + [
     "m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger",
-    "m5_counterplay", "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr", "mccfr",
+    "m5_counterplay", "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr", "m11_chosen", "mccfr",
 ]
 
 
@@ -108,6 +108,7 @@ def main():
     p.add_argument("--zoo", choices=["all"], help="alias for --opp all")
     p.add_argument("--deals", type=int, default=1000)
     p.add_argument("--seeds", type=int, default=3)
+    p.add_argument("--seed-start", type=int, default=0, help="first seed in the consecutive range")
     p.add_argument("--timing", action="store_true")
     p.add_argument("--out", default="league/results.csv")
     args = p.parse_args()
@@ -119,7 +120,7 @@ def main():
         if not exists or os.path.getsize(args.out) == 0:
             w.writeheader()
         for opponent in opponents:
-            for seed in range(args.seeds):
+            for seed in range(args.seed_start, args.seed_start + args.seeds):
                 row = match(args.bot, opponent, seed, args.deals)
                 w.writerow(row)
                 f.flush()
