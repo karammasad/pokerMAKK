@@ -4,6 +4,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 
 | Label | Runnable ID | Description | Status |
 | --- | --- | --- | --- |
+| Messi | `messi` | Adaptive pressure with response-gated reraises and a late-half timing guard | Research challenger |
 | Anchor | `m5_challenger` | Adaptive turn pressure over the counterplay equity policy | Current entry default |
 | Talon | `m5_counterplay` | Refined preflop table and pressure-oriented postflop policy | Team comparison candidate |
 | M5 Classic | `m5_classic` | Preserved original M5; anchor for existing teammate strategies | Historical reference |
