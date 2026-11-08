@@ -1,7 +1,7 @@
 """doku: Everything: all teammate attacks (turn/river/flop-mix pressure, mixed opens, river calls) over the City engine, adaptive bluffs, thin value vs stations."""
 from bots import city_core as core
 
-PROFILE = {'pot_cut': 0.74, 'half_cut': 0.35, 'call_margin': 0.3, 'pre_open': 0.52, 'tb_turn': True, 'tb_river': True, 'tb_flop_mix': True, 'open_mix': True, 'river_call_margin': 0.28, 'bluff': 0.05, 'station_thin': True}
+PROFILE = {'rr_cut': 0.85, 'no_refine_s': 1.1, 'panic_s': 1.8, 'panic_samples': 10, 'pot_cut': 0.74, 'half_cut': 0.35, 'call_margin': 0.3, 'pre_open': 0.52, 'tb_turn': True, 'tb_river': True, 'tb_flop_mix': True, 'open_mix': True, 'river_call_margin': 0.28, 'bluff': 0.05, 'station_thin': True}
 
 
 def load():

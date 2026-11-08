@@ -1,7 +1,7 @@
 """ederson: Adaptive exploiter: reads fold rate; bluffs hard at folders, thins value and stops bluffing at stations."""
 from bots import city_core as core
 
-PROFILE = {'half_cut': 0.36, 'tb_turn': True, 'tb_flop_mix': True, 'bluff': 0.08, 'bluff_pot': False, 'station_thin': True, 'river_call_margin': 0.28, 'open_mix': True}
+PROFILE = {'rr_cut': 0.85, 'no_refine_s': 1.3, 'panic_s': 2.1, 'panic_samples': 10, 'half_cut': 0.36, 'tb_turn': True, 'tb_flop_mix': True, 'bluff': 0.08, 'bluff_pot': False, 'station_thin': True, 'river_call_margin': 0.28, 'open_mix': True}
 
 
 def load():
