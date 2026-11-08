@@ -27,7 +27,7 @@ RESEARCH_CANDIDATES = PORTFOLIO + [
     "rook_fast", "kestrel", "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish",
     "doku", "stones", "akanji", "ederson", "mahrez", "gundogan", "aguero",
     "rangeglass", "telltide", "riverloom", "suitspark", "pebble_cfr", "undertow",
-    "northstar", "river_ruse", "osprey",
+    "northstar", "river_ruse", "osprey", "harrier",
 ]
 
 
