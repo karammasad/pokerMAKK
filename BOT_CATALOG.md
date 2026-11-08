@@ -29,6 +29,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Profiles | `m8_bayes_types` | Public-action type posterior | Research comparator |
 | Regret | `m9_cfrplus` | Compact MCCFR+ table with fallback | Research comparator |
 | Sequence | `m10_seq_cfr` | Sequence-aware MCCFR+ table with fallback | Research comparator |
+| Aguero | `aguero` | City engine plus a cross-hand opponent model: per-street fold response gates bluffs, preflop fold rate widens opens, showdown reads of bet/call strength adjust call margins and re-raise folds | City family candidate (in evaluation) |
 | Gundogan | `gundogan` | Captain: precision pressure, gated turn/river attacks, call-down vs aggressors, M5 style only vs true maniacs | City family candidate |
 | Akanji | `akanji` | Precision pressure with call-down vs all aggressors | City family candidate |
 | Doku | `doku` | All teammate attacks (turn/river/flop-mix, mixed opens, river calls) over the City engine | City family candidate |
