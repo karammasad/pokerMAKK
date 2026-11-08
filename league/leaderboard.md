@@ -207,3 +207,24 @@ entirely positive, 15000 deals), and strictly better than or equal to every
 other top-5 bot it was tested against. Per standing policy `bots/active.py`
 has **not** been touched; promoting it to the live default is the human's
 call.
+
+## PROMOTED: `messi_v6` is now the default (`bots/active.py`)
+
+The user approved promotion, conditional on one more check: a full-zoo gate
+(`python league/run.py --bot messi_v6 --zoo all --seeds 3`, the complete
+ZOO + EQUITY_ZOO + RESEARCH_CANDIDATES field — 71 opponents, 213 matches, not
+just the curated top-5 group) to confirm the edge holds broadly and wasn't
+narrowly tuned against just `aguero`/`ederson`/`mahrez`/`m5_challenger`.
+
+**Full-zoo gate result: 160 win / 50 chop / 3 loss, 0 errors across all 213
+matches.** The only losses were to `messi_v6`'s own earlier sibling variant
+`messi_v2` (an internal, closely-related strategy — not a competitive threat
+from the field) — no other bot in the entire ~70-bot zoo beat it. Combined
+with the already-confirmed real edge over `m5_challenger` (+0.143 bb/deal,
+CI entirely positive, 15 seeds) and the strengthened top-5 numbers above,
+this clears the bar.
+
+**`bots/active.py`'s `ACTIVE_BOT` default changed from `m5_challenger` to
+`messi_v6`.** `m5_challenger` remains in the roster as the primary
+reference/regression baseline — undefeated through extensive validation
+against every other challenger this session until `messi_v6` broke through.

@@ -9,8 +9,8 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Messi v3 | `messi_v3` | Messi with a looser preflop steal and looser raise-the-raiser bluff | Research challenger; confirmed loser vs m5_challenger (5-seed screen, CI entirely negative) |
 | Messi v4 | `messi_v4` | Messi with the raise-the-raiser bluff removed entirely (diagnostic variant) | Research challenger; screened only (5 seeds) |
 | Messi v5 | `messi_v5` | Messi with a looser checked-to-river semi-bluff gate | Research challenger; screened only (5 seeds), no improvement |
-| Messi v6 | `messi_v6` | Messi v2's tightened bluff plus a City-engine-style reraise-discipline fold (fold to a reraise unless equity >=0.85) | Research challenger; strongest variant found this pass -- beats aguero/ederson/mahrez, improves (but does not yet resolve) the m5_challenger chop |
-| Anchor | `m5_challenger` | Adaptive turn pressure over the counterplay equity policy | Current entry default |
+| Messi v6 | `messi_v6` | Messi v2's tightened bluff plus a City-engine-style reraise-discipline fold (fold to a reraise unless equity >=0.85) | **Current entry default.** Validated beating m5_challenger head-to-head (+0.143 bb/deal, CI[+0.055,+0.231], 15 seeds x 1000 deals pooled) and strengthened wins over aguero/ederson/mahrez vs plain messi. Full `--zoo all --seeds 3` gate: 160 win / 50 chop / 3 loss (losses only to sibling variant messi_v2), 0 errors. Promoted from m5_challenger. |
+| Anchor | `m5_challenger` | Adaptive turn pressure over the counterplay equity policy | Prior champion; undefeated through extensive validation against every other challenger this session until messi_v6. Kept as the primary reference/regression baseline. |
 | Talon | `m5_counterplay` | Refined preflop table and pressure-oriented postflop policy | Team comparison candidate |
 | M5 Classic | `m5_classic` | Preserved original M5; anchor for existing teammate strategies | Historical reference |
 | Turnblade | `turnblade` | Fixed turn pressure | Counterplay challenger |
