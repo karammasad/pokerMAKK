@@ -1,72 +1,97 @@
-# Round-robin roster shortlist
+# Round-robin leaderboard — official format (real results)
 
-Scope note: this file currently holds a **roster recommendation only** — which
-bots to include in a round-robin, not round-robin results. The actual
-official-format round-robin (1000 deals x 2 halves per pairing, pooled bb/deal,
-95% CI verdict, matching the competition's duplicate format) is deferred: the
-user wants to design a prompt for teammates to run that tournament themselves,
-as a separate follow-up. This file exists so that prompt can start from an
-already-curated field instead of all ~46 `bots/` directories.
+Official-format round-robin: 12 bots, 66 pairings, 3 seeds (0,1,2) pooled per pairing (3000 deals/pairing total), 1000 deals/seed x 2 halves/match — matches the competition's duplicate format (1000 deals x 2 halves per seed, pooled bb/deal, 95% CI verdict: win if CI entirely >0, loss if entirely <0, chop otherwise). `harrier` (CFR-family research bot) is not yet merged to origin/main as of this run and is not included; add it and re-run once it lands. `messi` was added mid-run (teammate push) and given the same treatment: full pooled pairings vs every other shortlist bot.
 
-Methodology for the cut: read `BOT_CATALOG.md` and the full `league/results.csv`
-history, aggregated by opponent name (pooling every match ever recorded against
-`m5_challenger`, sign-corrected to `m5_challenger`'s perspective). Historical
-rows are **not fully trustworthy on their own** — `m5_challenger`'s own code
-changed mid-project (that's why `m5_classic` exists, as the frozen pre-refactor
-snapshot), so old rows can reflect a weaker version of `m5_challenger` than the
-one in the repo today. Every bot with no fresh data, or with a historical
-signal that looked surprising (e.g. the full "first City family" — foden,
-bernardo, rodri, haaland, de_bruyne, grealish — showed `m5_challenger` *losing*
-by -0.5 to -1.0 bb/deal in old rows), got a fresh cheap sanity check this pass
-(single seed, 150 deals, current code) before being cut or kept. 150-deal
-single-seed results are directional only — notably, `akanji` showed a *loss*
-for `m5_challenger` at this cheap setting, which is the same low-sample noise
-that misled an earlier pass in this project; the properly validated number
-(10 seeds x 1000 deals pooled, from earlier this session) is `m5_challenger`
-**beating** `akanji` and `gundogan` by +0.27-0.28 bb/deal with the CI entirely
-positive. Don't re-litigate that; it's settled.
+| Rank | Bot | Points | Record (W-L-C) | Avg bb/deal |
+| --- | --- | --- | --- | --- |
+| 1 | `aguero` | 9.5 | 9-1-1 | +0.488 |
+| 2 | `messi` | 9.0 | 7-0-4 | +0.374 |
+| 3 | `mahrez` | 8.0 | 7-2-2 | +0.434 |
+| 4 | `ederson` | 8.0 | 8-3-0 | +0.308 |
+| 5 | `m5_challenger` | 7.0 | 6-3-2 | +0.219 |
+| 6 | `kestrel` | 6.0 | 4-3-4 | +0.119 |
+| 7 | `telltide` | 5.5 | 3-3-5 | +0.058 |
+| 8 | `northstar` | 4.0 | 2-5-4 | +0.025 |
+| 9 | `osprey` | 3.5 | 2-6-3 | -0.185 |
+| 10 | `m5_counterplay` | 3.5 | 2-6-3 | -0.197 |
+| 11 | `m9_cfrplus` | 1.0 | 0-9-2 | -0.601 |
+| 12 | `m5_classic` | 1.0 | 1-10-0 | -1.044 |
 
-## Keep (shortlist for the round-robin) — 11 bots
+## Current default / what we would submit today
 
-| Bot | Why kept |
-| --- | --- |
-| `m5_challenger` | Current anchor/default (`bots/active.py`). Repeatedly validated champion this session against every challenger tried (Kestrel, Osprey, Harrier, both City families). The bar everything else is measured against. |
-| `m5_classic` | Frozen pre-refactor M5. Useful fixed reference point to see how far the field (including `m5_challenger` itself) has moved; several other bots (`m11_chosen`, `m7_cherki`) intentionally depend on this frozen version rather than current `m5_challenger`. |
-| `m5_counterplay` (Talon) | Distinct postflop-pressure lineage; feeds Kestrel and others. Historically the closest sustained rival to `m5_challenger` (9W-6L vs m5, no chops — genuinely contested, not just noise). |
-| `kestrel` | Talon + evidence-gated semi-bluff (turn+river). Most competitive challenger on record: 4W-4L-38C vs `m5_challenger`, net avg ~0 bb/deal across 46 historical matches — essentially a coin flip. Worth a real multi-seed look. |
-| `osprey` | Range-aware particle-filter equity (opponent-hand reweighting) instead of equity-vs-random. Already validated this session: loses to `m5_challenger` (-0.41 bb/deal, CI negative) but beats the rest of the zoo soundly (85W/48C/17L). Structurally the most distinct opponent-modeling approach in the roster. |
-| `ederson` | City-engine "adaptive exploiter" (bluffs folders, thins value vs stations). Most competitive City-family variant on record (near-even, -0.1 avg) and a fresh check this pass confirmed it's still close (chop at seed 55000). Kept as the family's single representative. |
-| `mahrez` | City-engine "ballsy" aggressive outlier (overbluffs, floats, bluff-raises, stop-loss). Deliberately different risk profile from every other bot in the roster — good stress-test/diversity pick even though BOT_CATALOG flags it as exploitable by turn-pressure bots. |
-| `telltide` | Bayesian bet-response expected-value policy — distinct mechanism (posterior over bet-response types) from every equity-based bot above. Large historical sample (35 matches), fairly close to `m5_challenger` (+0.13 avg, mostly chops). |
-| `northstar` | Telltide + evidence-gated large river-call adaptation. Actually beat `m5_challenger` in 3 of its historical current-code matches (3W-2L-13chop net +0.12) — one of only two bots in the whole catalog with any recorded current-code wins against the anchor. Worth a real multi-seed look. |
-| `m9_cfrplus` | Compact MCCFR+ table with fallback — the clearest surviving CFR-family / academic-technique representative (per the user's standing "frontier technology" directive) with no disqualifying data against it yet. Paired with `m5_counterplay`/Talon and `osprey`, keeps the roster's mechanisms genuinely diverse rather than N variations on equity estimation. |
-| `aguero` | Newest bot (just landed from a teammate, City engine + cross-hand opponent model that rewrites its profile every decision within a half). No real validation yet — a single quick check even showed a loss for `m5_challenger` — but it's too new and structurally distinct (learns across hands, not just within one) to cut sight-unseen. Flagged as "needs the real round-robin before anyone trusts this result." |
+**Standings leader is `aguero`, not `m5_challenger`.** Head-to-head vs `m5_challenger` in this run: +0.4927 bb/deal, CI[+0.2871,+0.6982], verdict=win, n=3000 deals.
 
-`harrier` (CFR-family academic-research bot, built independently this session)
-is not yet merged to `origin/main` as of this cut — it's still being finished
-by a concurrent effort. **Add it to the shortlist once it lands**; it's the
-other dedicated academic/frontier-technique effort from this session and
-belongs alongside `m9_cfrplus`.
+This head-to-head CI is entirely positive for `aguero` over `m5_challenger` — **recommended for promotion pending human review** (standing policy requires a significant pooled-CI win across 8-10+ seeds x 1000 deals specifically vs `m5_challenger` before flipping `bots/active.py`; this run used 3 seeds, so a deeper confirmation run at 8-10 seeds is still warranted). `bots/active.py` was **not** modified by this run.
 
-## Cut — with rationale
+**Bots that beat `m5_challenger` head-to-head with a significant CI in this run:** `ederson` (+0.4463 bb/deal), `mahrez` (+0.3387 bb/deal), `aguero` (+0.4927 bb/deal). All flagged for deeper confirmation (8-10+ seeds) before any promotion decision.
 
-| Bot(s) | Rationale |
-| --- | --- |
-| `m1_equity`, `m1_reference`, `m1_team_tuned` | Foundational baseline equity bots; already clearly dominated by `m5_challenger` (e.g. `m1_equity`: 11W-0L-3chop against it). Useful as regression baselines, not round-robin contenders. |
-| `m2_cfr`, `m3_exploit`, `m4_learned`, `m10_seq_cfr`, `pebble_cfr`, `mccfr` | Early experimental prototypes. Every recorded match has `m5_challenger` winning by +1.6 to +7 bb/deal. Clearly uncompetitive legacy methods. |
-| `m6_safeadapt` | Fresh check this pass: loses to `m5_challenger` by +3.3 bb/deal (single seed, 150 deals). Not close. |
-| `m8_bayes_types`, `rangefinder`, `rangeglass`, `riverloom`, `suitspark` | No standout signal in either direction, and mechanically redundant with `telltide`/`osprey` (already-kept Bayesian/opponent-modeling approaches). Cut for redundancy, not weakness. |
-| `m7_precision`, `m7_cherki`, `m11_chosen`, `rook_fast` | Hybrid/precision variants built on the frozen `m5_classic` or `m5_counterplay`. All confirmed current-code losers to `m5_challenger` (0 wins across ~29 combined historical matches). `kestrel` and `m5_counterplay` already represent this lineage, and more competitively. |
-| `river_ruse` | BOT_CATALOG explicitly labels this a "sparring opponent" (practice/test bot), not a real contender. |
-| `mirrorfin`, `nightjar`, `tidehunter`, `turnblade`, `duskfox` | A cluster of minor turn/river-pressure tweaks on the Talon lineage. Fresh checks this pass: all land within a hair of 0 bb/deal (near-identical chops, no distinct signal from each other or from `kestrel`). Redundant as a group; cut entirely. |
-| `akanji`, `gundogan`, `doku`, `stones`, `haaland`, `de_bruyne`, `rodri`, `foden`, `bernardo`, `grealish` | The rest of both City families (10 bots total). `akanji`/`gundogan` already properly validated (10-seed pooled) to lose to `m5_challenger` by +0.27-0.28 bb/deal, CI entirely positive. The rest got a fresh single-seed sanity check this pass: `foden`, `bernardo`, `rodri`, `haaland`, `de_bruyne`, `grealish` all won or chopped for `m5_challenger`, zero losses. All 10 share `bots/city_core.py` with just different `PROFILE` dicts — `ederson` and `mahrez` already cover this design family's most-competitive and most-distinct members; the rest are redundant near-duplicates. |
-| `xavi` | Does not exist as a bot directory (checked: `bots/xavi/` is not present). Stale reference from an earlier directory listing; not a real bot. |
+## Full pairwise results
 
-## Net result
-
-46 bot directories -> **11 kept** (12 once `harrier` lands), covering every
-genuinely distinct mechanism present in the codebase (anchor/equity lineage,
-Talon pressure lineage + its semi-bluff extension, particle-filter opponent
-modeling, Bayesian bet-response modeling, City-engine aggression variants,
-CFR-family). This is the field recommended for the next, properly-run
-official-format round-robin.
+| Bot A | Bot B | bb/deal (A persp.) | CI | Verdict |
+| --- | --- | --- | --- | --- |
+| `m5_challenger` | `m5_classic` | +0.9387 | [+0.6686,+1.2088] | win |
+| `m5_challenger` | `m5_counterplay` | +0.3900 | [+0.3095,+0.4705] | win |
+| `m5_challenger` | `kestrel` | +0.0147 | [-0.0658,+0.0951] | chop |
+| `m5_challenger` | `osprey` | +0.4103 | [+0.3215,+0.4992] | win |
+| `m5_challenger` | `ederson` | -0.4463 | [-0.6346,-0.2580] | loss |
+| `m5_challenger` | `mahrez` | -0.3387 | [-0.6094,-0.0680] | loss |
+| `m5_challenger` | `telltide` | +0.3823 | [+0.1432,+0.6214] | win |
+| `m5_challenger` | `northstar` | +0.3283 | [+0.0705,+0.5861] | win |
+| `m5_challenger` | `m9_cfrplus` | +1.0710 | [+0.6595,+1.4825] | win |
+| `m5_challenger` | `aguero` | -0.4927 | [-0.6982,-0.2871] | loss |
+| `m5_challenger` | `messi` | +0.1550 | [-0.0296,+0.3396] | chop |
+| `m5_classic` | `m5_counterplay` | -0.8893 | [-1.1586,-0.6200] | loss |
+| `m5_classic` | `kestrel` | -1.1630 | [-1.4419,-0.8841] | loss |
+| `m5_classic` | `osprey` | -0.9280 | [-1.1988,-0.6572] | loss |
+| `m5_classic` | `ederson` | -1.2980 | [-1.5991,-0.9969] | loss |
+| `m5_classic` | `mahrez` | -1.3263 | [-1.6877,-0.9649] | loss |
+| `m5_classic` | `telltide` | -1.5870 | [-1.9034,-1.2706] | loss |
+| `m5_classic` | `northstar` | -1.5263 | [-1.8496,-1.2031] | loss |
+| `m5_classic` | `m9_cfrplus` | +0.5373 | [+0.0405,+1.0342] | win |
+| `m5_classic` | `aguero` | -1.4577 | [-1.7591,-1.1562] | loss |
+| `m5_classic` | `messi` | -0.9113 | [-1.2154,-0.6073] | loss |
+| `m5_counterplay` | `kestrel` | -0.3127 | [-0.4235,-0.2018] | loss |
+| `m5_counterplay` | `osprey` | +0.0157 | [-0.0372,+0.0686] | chop |
+| `m5_counterplay` | `ederson` | -0.8850 | [-1.0804,-0.6896] | loss |
+| `m5_counterplay` | `mahrez` | -0.5653 | [-0.8469,-0.2838] | loss |
+| `m5_counterplay` | `telltide` | -0.1993 | [-0.4168,+0.0181] | chop |
+| `m5_counterplay` | `northstar` | -0.1977 | [-0.4389,+0.0436] | chop |
+| `m5_counterplay` | `m9_cfrplus` | +0.4633 | [+0.0476,+0.8791] | win |
+| `m5_counterplay` | `aguero` | -0.7357 | [-0.9421,-0.5292] | loss |
+| `m5_counterplay` | `messi` | -0.2447 | [-0.4272,-0.0622] | loss |
+| `kestrel` | `osprey` | +0.3273 | [+0.2042,+0.4504] | win |
+| `kestrel` | `ederson` | -0.5627 | [-0.7613,-0.3641] | loss |
+| `kestrel` | `mahrez` | -0.3863 | [-0.6628,-0.1098] | loss |
+| `kestrel` | `telltide` | -0.0317 | [-0.2489,+0.1856] | chop |
+| `kestrel` | `northstar` | -0.0397 | [-0.2825,+0.2032] | chop |
+| `kestrel` | `m9_cfrplus` | +0.9332 | [+0.5205,+1.3458] | win |
+| `kestrel` | `aguero` | -0.5837 | [-0.7977,-0.3697] | loss |
+| `kestrel` | `messi` | +0.1920 | [-0.0079,+0.3919] | chop |
+| `osprey` | `ederson` | -0.8330 | [-1.0259,-0.6401] | loss |
+| `osprey` | `mahrez` | -0.5090 | [-0.7949,-0.2231] | loss |
+| `osprey` | `telltide` | -0.1830 | [-0.4051,+0.0391] | chop |
+| `osprey` | `northstar` | -0.1660 | [-0.4116,+0.0796] | chop |
+| `osprey` | `m9_cfrplus` | +0.5275 | [+0.1116,+0.9434] | win |
+| `osprey` | `aguero` | -0.7753 | [-0.9866,-0.5641] | loss |
+| `osprey` | `messi` | -0.2720 | [-0.4583,-0.0857] | loss |
+| `ederson` | `mahrez` | -1.2877 | [-1.6382,-0.9371] | loss |
+| `ederson` | `telltide` | +0.7917 | [+0.5004,+1.0829] | win |
+| `ederson` | `northstar` | +0.7930 | [+0.5051,+1.0809] | win |
+| `ederson` | `m9_cfrplus` | +0.5657 | [+0.0697,+1.0617] | win |
+| `ederson` | `aguero` | -0.9897 | [-1.2831,-0.6962] | loss |
+| `ederson` | `messi` | -0.5063 | [-0.8190,-0.1937] | loss |
+| `mahrez` | `telltide` | +0.2670 | [-0.0835,+0.6175] | chop |
+| `mahrez` | `northstar` | +0.3670 | [+0.0223,+0.7117] | win |
+| `mahrez` | `m9_cfrplus` | +0.5343 | [-0.0653,+1.1340] | chop |
+| `mahrez` | `aguero` | -0.2897 | [-0.5610,-0.0184] | loss |
+| `mahrez` | `messi` | -0.5180 | [-0.8814,-0.1546] | loss |
+| `telltide` | `northstar` | +0.1853 | [+0.0102,+0.3605] | win |
+| `telltide` | `m9_cfrplus` | +0.6007 | [+0.1781,+1.0233] | win |
+| `telltide` | `aguero` | -0.7350 | [-1.0191,-0.4509] | loss |
+| `telltide` | `messi` | +0.0282 | [-0.2728,+0.3292] | chop |
+| `northstar` | `m9_cfrplus` | +0.7267 | [+0.3006,+1.1528] | win |
+| `northstar` | `aguero` | -0.7193 | [-1.0065,-0.4321] | loss |
+| `northstar` | `messi` | +0.0133 | [-0.2520,+0.2786] | chop |
+| `m9_cfrplus` | `aguero` | +0.0400 | [-0.3467,+0.4267] | chop |
+| `m9_cfrplus` | `messi` | -0.6873 | [-1.1013,-0.2734] | loss |
+| `aguero` | `messi` | -1.3670 | [-1.7341,-0.9999] | loss |
