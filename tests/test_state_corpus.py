@@ -10,7 +10,7 @@ from league.zoo.simple import factory
 from bots.portfolio import factory as portfolio_factory, names as portfolio_names
 
 ROOT = Path(__file__).resolve().parent
-BOT_NAMES = ('m1_equity', 'm2_cfr', 'm3_exploit', 'm4_learned', 'm5_challenger', 'm5_counterplay', 'm5_classic', 'turnblade', 'duskfox', 'nightjar', 'tidehunter', 'mirrorfin', 'm7_cherki', 'm6_safeadapt', 'm7_precision', 'm8_bayes_types', 'm9_cfrplus', 'm10_seq_cfr', 'm11_chosen', 'mccfr', 'rangefinder', 'm1_team_tuned', 'm1_reference', 'rook_fast', 'kestrel', 'haaland', 'de_bruyne', 'rodri', 'foden', 'bernardo', 'grealish', 'doku', 'stones', 'akanji', 'ederson', 'mahrez', 'gundogan', 'rangeglass', 'telltide', 'riverloom', 'suitspark', 'pebble_cfr', 'undertow') + (
+BOT_NAMES = ('m1_equity', 'm2_cfr', 'm3_exploit', 'm4_learned', 'm5_challenger', 'm5_counterplay', 'm5_classic', 'turnblade', 'duskfox', 'nightjar', 'tidehunter', 'mirrorfin', 'm7_cherki', 'm6_safeadapt', 'm7_precision', 'm8_bayes_types', 'm9_cfrplus', 'm10_seq_cfr', 'm11_chosen', 'mccfr', 'rangefinder', 'm1_team_tuned', 'm1_reference', 'rook_fast', 'kestrel', 'haaland', 'de_bruyne', 'rodri', 'foden', 'bernardo', 'grealish', 'doku', 'stones', 'akanji', 'ederson', 'mahrez', 'gundogan', 'rangeglass', 'telltide', 'riverloom', 'suitspark', 'pebble_cfr', 'undertow', 'northstar', 'river_ruse') + (
              *portfolio_names(), "random", "calling_station", "always_half", "always_pot",
              "nit", "loose_passive", "maniac", "shover", "fold_to_raise")
 
@@ -21,7 +21,7 @@ def make_bots():
     for name in BOT_NAMES:
         if name in portfolio_names():
             module = portfolio_factory(name)
-        elif name in set({'m4_learned', 'grealish', 'm1_team_tuned', 'kestrel', 'de_bruyne', 'riverloom', 'mahrez', 'm6_safeadapt', 'bernardo', 'turnblade', 'rangeglass', 'stones', 'doku', 'duskfox', 'ederson', 'm5_counterplay', 'telltide', 'rodri', 'm9_cfrplus', 'm2_cfr', 'foden', 'nightjar', 'm3_exploit', 'm7_cherki', 'mccfr', 'gundogan', 'm7_precision', 'm5_classic', 'rook_fast', 'pebble_cfr', 'undertow', 'm10_seq_cfr', 'mirrorfin', 'tidehunter', 'm5_challenger', 'haaland', 'm1_equity', 'rangefinder', 'm1_reference', 'm11_chosen', 'akanji', 'suitspark', 'm8_bayes_types'}):
+        elif name in set({'m4_learned', 'grealish', 'm1_team_tuned', 'kestrel', 'de_bruyne', 'riverloom', 'mahrez', 'm6_safeadapt', 'bernardo', 'turnblade', 'rangeglass', 'stones', 'doku', 'duskfox', 'ederson', 'm5_counterplay', 'telltide', 'rodri', 'm9_cfrplus', 'm2_cfr', 'foden', 'nightjar', 'm3_exploit', 'm7_cherki', 'mccfr', 'gundogan', 'm7_precision', 'm5_classic', 'rook_fast', 'pebble_cfr', 'undertow', 'northstar', 'river_ruse', 'm10_seq_cfr', 'mirrorfin', 'tidehunter', 'm5_challenger', 'haaland', 'm1_equity', 'rangefinder', 'm1_reference', 'm11_chosen', 'akanji', 'suitspark', 'm8_bayes_types'}):
             module = importlib.import_module(f"bots.{name}.bot")
             load = getattr(module, "load", None)
             if load:
