@@ -25,6 +25,37 @@ This head-to-head CI is entirely positive for `aguero` over `m5_challenger` — 
 
 **Bots that beat `m5_challenger` head-to-head with a significant CI in this run:** `ederson` (+0.4463 bb/deal), `mahrez` (+0.3387 bb/deal), `aguero` (+0.4927 bb/deal). All flagged for deeper confirmation (8-10+ seeds) before any promotion decision.
 
+## Top-5 deep validation — 10 seeds x 1000 deals pooled, full C(5,2) matrix
+
+The 3-seed round-robin above is noisy (this project has already been burned once by a 3-seed/low-sample result reversing at depth — see the akanji/gundogan episode earlier in this project's history, where a fast pass showed them beating `m5_challenger` and a proper 10-seed pooled validation showed the opposite). So every pairing among the top 5 (`m5_challenger`, `aguero`, `ederson`, `mahrez`, `messi`) was re-run at full depth: 10 seeds (5000-5009), 1000 deals/seed x 2 halves, pooled bb/deal, 95% CI. All 10 pairings, 0 errors throughout.
+
+| Bot A | Bot B | bb/deal (A persp.) | CI | Verdict |
+| --- | --- | --- | --- | --- |
+| `m5_challenger` | `aguero` | -0.2588 | [-0.3731,-0.1445] | **loss** |
+| `m5_challenger` | `ederson` | -0.1477 | [-0.2603,-0.0351] | **loss** |
+| `m5_challenger` | `mahrez` | +0.0367 | [-0.1020,+0.1754] | chop |
+| `m5_challenger` | `messi` | +0.0564 | [-0.0451,+0.1579] | chop |
+| `aguero` | `messi` | -1.9171 | [-2.1210,-1.7132] | **loss (big)** |
+| `aguero` | `mahrez` | +0.3096 | [+0.1587,+0.4605] | win |
+| `aguero` | `ederson` | +0.5100 | [+0.3795,+0.6405] | win |
+| `messi` | `mahrez` | +0.8959 | [+0.6934,+1.0984] | win |
+| `messi` | `ederson` | +0.7156 | [+0.5403,+0.8909] | win |
+| `mahrez` | `ederson` | +0.8163 | [+0.6245,+1.0081] | win |
+
+**Deep-validated standings (supersedes the 3-seed ranking for these 5 bots):**
+
+| Rank | Bot | Points | Record (W-L-C) | Avg bb/deal |
+| --- | --- | --- | --- | --- |
+| 1 | `messi` | 3.5 | 3-0-1 | +0.868 |
+| 2 | `aguero` | 3.0 | 3-1-0 | -0.210 |
+| 3 | `mahrez` | 1.5 | 1-2-1 | -0.106 |
+| 4 | `m5_challenger` | 1.0 | 0-2-2 | -0.078 |
+| 5 | `ederson` | 1.0 | 1-3-0 | -0.474 |
+
+**The ranking order changed from the 3-seed pass.** 3-seed round-robin order was `aguero` > `messi` > `mahrez` > `ederson` > `m5_challenger`. At full depth it's `messi` > `aguero` > `mahrez` > `m5_challenger` > `ederson` — `messi` overtakes `aguero` (it beats `aguero` head-to-head by a large, clearly significant margin: -1.92 bb/deal for `aguero`), and `ederson` collapses from 4th to last (it only beats `m5_challenger`; it loses to every other top-5 bot, including the two `m5_challenger` itself only chops with). `m5_challenger` climbs from last to 4th once measured against this specific group rather than the full 3-seed field — `aguero` and `ederson` genuinely beat it (CI entirely negative, holding up at 10x the sample, unlike the akanji/gundogan reversal), but it chops with `mahrez` and `messi` rather than losing to everyone.
+
+**Recommendation for human review:** `messi` is the strongest validated candidate in this group — it has a significant head-to-head win or chop against every other top-5 bot, including a decisive win over the bot that led the 3-seed pass (`aguero`). `bots/active.py` has **not** been touched; promotion remains a human decision per standing policy.
+
 ## Full pairwise results
 
 | Bot A | Bot B | bb/deal (A persp.) | CI | Verdict |
