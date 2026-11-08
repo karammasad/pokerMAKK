@@ -10,7 +10,7 @@ from league.zoo.simple import factory
 from bots.portfolio import factory as portfolio_factory, names as portfolio_names
 
 ROOT = Path(__file__).resolve().parent
-BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_counterplay", "mccfr",
+BOT_NAMES = ("m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_counterplay", "m5_classic", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin", "mccfr",
              *portfolio_names(), "random", "calling_station", "always_half", "always_pot",
              "nit", "loose_passive", "maniac", "shover", "fold_to_raise")
 
@@ -21,7 +21,7 @@ def make_bots():
     for name in BOT_NAMES:
         if name in portfolio_names():
             module = portfolio_factory(name)
-        elif name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_counterplay", "mccfr"}:
+        elif name in {"m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_counterplay", "m5_classic", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin", "mccfr"}:
             module = importlib.import_module(f"bots.{name}.bot")
             load = getattr(module, "load", None)
             if load:
