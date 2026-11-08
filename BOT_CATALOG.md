@@ -4,6 +4,8 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 
 | Label | Runnable ID | Description | Status |
 | --- | --- | --- | --- |
+| Atlas | `atlas` | Aguero-derived complete response accounting, confidence-gated counterplay and prefix-reusable Monte Carlo | Frozen validated baseline; paired leader-pool gain over Aguero |
+| Atlas Learning | `atlas_learning` | Atlas plus bounded outcome feedback for marginal river calls | Challenger; fresh confirmation positive, final full-zoo verification in progress; selectable with POKER_BOT |
 | Messi | `messi` | Adaptive pressure with response-gated reraises and a late-half timing guard | Research challenger; chops m5_challenger at 30-seed pooled depth |
 | Messi v2 | `messi_v2` | Messi with a tightened raise-the-raiser bluff (more evidence, smaller cost cap) | Research challenger; screened only (5 seeds) |
 | Messi v3 | `messi_v3` | Messi with a looser preflop steal and looser raise-the-raiser bluff | Research challenger; confirmed loser vs m5_challenger (5-seed screen, CI entirely negative) |
