@@ -11,3 +11,7 @@ An always-fold diagnostic (`northstar_probe`) improved average results versus Te
 The gated version's fresh three-seed matched screen (seeds 8500–8502, 1,000 deals) produced mean changes versus Telltide: Anchor +0.052, Kestrel −0.009, Turnblade +0.031, Stones −0.002, Ederson +0.025, River Ruse −0.004 bb/deal. These are small point estimates, not proof of improvement. Runtime-dependent sampling can also change actions across runs. Full-roster and independent holdout evaluation are needed.
 
 The raw league rows are appended to `league/results.csv`; see `league/results_notes.md` for run details. River Ruse is a sparring bot, not a claim about a teammate's strategy.
+
+## Timing revision
+
+The initial full-roster run was stopped after 104 completed match rows because one half used 4.139 seconds, above the 4-second target. Northstar was revised to use a smaller equity sample when facing a postflop bet after 1.2 seconds of accumulated thought, and to choose exploration calls using private cards. A focused three-seed rerun against M8, Anchor, Kestrel and River Ruse completed without errors/fallbacks and with maximum half time under 1.9 seconds. This is a changed policy: earlier result estimates do not validate it, and its full-roster run is still required.
