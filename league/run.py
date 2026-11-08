@@ -19,11 +19,13 @@ from bots.portfolio import factory as portfolio_factory, names as portfolio_name
 ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_passive", "maniac", "shover", "fold_to_raise"]
 PORTFOLIO = list(portfolio_names())
 RESEARCH_CANDIDATES = PORTFOLIO + [
-    "m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger",
-    "m5_counterplay", "m5_classic", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin",
-    "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr",
-    "m11_chosen", "mccfr", "rangefinder", "m1_team_tuned", "m1_reference", "rook_fast", "kestrel",
-    "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish", "osprey",
+    "m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_classic",
+    "m5_counterplay", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin",
+    "m6_safeadapt", "m7_cherki", "m7_precision", "m8_bayes_types", "m9_cfrplus",
+    "m10_seq_cfr", "m11_chosen", "mccfr", "rangefinder", "m1_team_tuned", "m1_reference",
+    "rook_fast", "kestrel", "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish",
+    "doku", "stones", "akanji", "ederson", "mahrez", "gundogan",
+    "rangeglass", "telltide", "riverloom", "suitspark", "pebble_cfr", "osprey",
 ]
 
 
