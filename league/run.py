@@ -84,6 +84,8 @@ def match(bot_name, opp_name, seed, deals):
     halves = []
     errors = 0
     fallbacks = 0
+    opponent_fallbacks = 0
+    opponent_think = []
     think = []
     decision_ms = []
     t0 = time.perf_counter()
@@ -92,6 +94,9 @@ def match(bot_name, opp_name, seed, deals):
         halves.append(n)
         errors += err
         ourmem = memories[0 if h == 1 else 1]
+        oppmem = memories[1 if h == 1 else 0]
+        opponent_fallbacks += oppmem.get("_fallbacks", 0)
+        opponent_think.append(oppmem.get("_think_s", 0.0))
         fallbacks += ourmem.get("_fallbacks", 0)
         think.append(ourmem.get("_think_s", 0.0))
         decision_ms.extend(ourmem.get("_decision_ms", []))
@@ -105,7 +110,10 @@ def match(bot_name, opp_name, seed, deals):
     p99 = ordered[max(0, math.ceil(0.99 * len(ordered)) - 1)] if ordered else 0.0
     return dict(bot=bot_name, opponent=opp_name, seed=seed, deals=deals, bb_deal=mean,
                 ci_low=ci[0], ci_high=ci[1], verdict=verdict, errors=errors,
-                fallbacks=fallbacks, think_s=max(think, default=0.0),
+                fallbacks=fallbacks, opponent_fallbacks=opponent_fallbacks,
+                opponent_think_h1_s=opponent_think[0] if opponent_think else 0.0,
+                opponent_think_h2_s=opponent_think[1] if len(opponent_think) > 1 else 0.0,
+                think_s=max(think, default=0.0),
                 think_h1_s=think[0] if think else 0.0, think_h2_s=think[1] if len(think) > 1 else 0.0,
                 p50_ms=p50, p99_ms=p99, elapsed=time.perf_counter()-t0)
 
@@ -124,7 +132,12 @@ def main():
     opponents = ZOO + list(EQUITY_ZOO) + RESEARCH_CANDIDATES if args.zoo or args.opp == "all" else [x.strip() for x in args.opp.split(",")]
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     exists = os.path.exists(args.out)
-    with open(args.out, "a", newline="") as f:
+    side_path = os.path.splitext(args.out)[0] + ".sides.csv"
+    side_exists = os.path.exists(side_path) and os.path.getsize(side_path) > 0
+    with open(args.out, "a", newline="") as f, open(side_path, "a", newline="") as sf:
+        side = csv.DictWriter(sf, fieldnames=["bot", "opponent", "seed", "deals", "bb_deal", "elapsed", "fallbacks", "opponent_fallbacks", "think_h1_s", "think_h2_s", "opponent_think_h1_s", "opponent_think_h2_s"], extrasaction="ignore")
+        if not side_exists:
+            side.writeheader()
         w = csv.DictWriter(f, fieldnames=["bot", "opponent", "seed", "deals", "bb_deal", "ci_low", "ci_high", "verdict", "errors", "fallbacks", "think_s", "p50_ms", "p99_ms", "elapsed"], extrasaction="ignore")
         if not exists or os.path.getsize(args.out) == 0:
             w.writeheader()
@@ -133,7 +146,9 @@ def main():
                 row = match(args.bot, opponent, seed, args.deals)
                 w.writerow(row)
                 f.flush()
-                print(f"{row['bot']} vs {opponent} seed={seed}: {row['verdict']} {row['bb_deal']:+.3f} bb/deal CI[{row['ci_low']:+.3f},{row['ci_high']:+.3f}] errors={row['errors']} fallbacks={row['fallbacks']} think h1/h2={row['think_h1_s']:.3f}/{row['think_h2_s']:.3f}s p50/p99={row['p50_ms']:.3f}/{row['p99_ms']:.3f}ms")
+                side.writerow(row)
+                sf.flush()
+                print(f"{row['bot']} vs {opponent} seed={seed}: {row['verdict']} {row['bb_deal']:+.3f} bb/deal CI[{row['ci_low']:+.3f},{row['ci_high']:+.3f}] errors={row['errors']} fallbacks={row['fallbacks']} opponent_fallbacks={row['opponent_fallbacks']} opp_think h1/h2={row['opponent_think_h1_s']:.3f}/{row['opponent_think_h2_s']:.3f}s think h1/h2={row['think_h1_s']:.3f}/{row['think_h2_s']:.3f}s p50/p99={row['p50_ms']:.3f}/{row['p99_ms']:.3f}ms")
 
 if __name__ == "__main__":
     main()

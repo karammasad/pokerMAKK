@@ -77,3 +77,7 @@ The five research challengers added on 2026-11-07 are experimental and are not t
 - An instrumented Anchor versus Kestrel 1,000-deal run on seed 9500 hit 2,965 fallbacks under load; the run was stopped and that row is invalid for strategy analysis.
 
 - City v2 screen: Northstar and Telltide played Gundogan, Akanji, Doku, Stones, Ederson and Mahrez on seed 9700, 200 deals per matchup, after the City v2 update. All twelve verdicts were chops, with 0 errors/fallbacks. These short screens are insufficient to establish a relative edge. Both bots showed increased decision latency under the observed machine load.
+
+- Evaluation integrity update: older `league/run.py` rows report only the tested bot's fallback count, not the opponent's; absence of opponent fallbacks cannot be inferred from these rows. An explicit both-side audit of Regatta vs Anchor seed 9300 recorded opponent fallbacks [1204, 859]; its +0.937 bb/deal is invalid for strategic comparison. The initial Regatta wins on seeds 9300–9302 did not record opponent fallbacks and are unverified. After adding opponent metrics, a same-seed rerun had zero opponent fallbacks and averaged −0.438 bb/deal vs Anchor and −0.326 vs Kestrel. The river model and Northstar remain experimental.
+
+- From this update forward, the league appends `<results basename>.sides.csv`, containing both sides' fallback counts and per-half think times. The existing results CSV remains append-only and retains its original columns. A result involving either side's fallback should not be treated as a clean strategy comparison.
