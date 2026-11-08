@@ -15,6 +15,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Rook | `m11_chosen` | Anchor preflop and Talon postflop | Comparison candidate |
 | Rangefinder | `rangefinder` | M5-derived policy with confidence-shrunk showdown range updates | Research challenger |
 | Rangeglass | `rangeglass` | Corrected single-shrink showdown range model | Research challenger |
+| Undertow | `undertow` | Telltide with threshold-based extra equity samples | Experimental challenger |
 | Telltide | `telltide` | Bayesian bet-response expected-value policy | Research challenger |
 | Riverloom | `riverloom` | Sequential equity sampling near action thresholds | Research challenger |
 | Suitspark | `suitspark` | Preflop-action-conditioned Short Deck PLO5 range equity | Research challenger |

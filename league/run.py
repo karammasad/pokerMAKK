@@ -25,7 +25,7 @@ RESEARCH_CANDIDATES = PORTFOLIO + [
     "m10_seq_cfr", "m11_chosen", "mccfr", "rangefinder", "m1_team_tuned", "m1_reference",
     "rook_fast", "kestrel", "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish",
     "doku", "stones", "akanji", "ederson", "mahrez", "gundogan",
-    "rangeglass", "telltide", "riverloom", "suitspark", "pebble_cfr", "osprey",
+    "rangeglass", "telltide", "riverloom", "suitspark", "pebble_cfr", "undertow", "osprey",
 ]
 
 
