@@ -21,6 +21,14 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Profiles | `m8_bayes_types` | Public-action type posterior | Research comparator |
 | Regret | `m9_cfrplus` | Compact MCCFR+ table with fallback | Research comparator |
 | Sequence | `m10_seq_cfr` | Sequence-aware MCCFR+ table with fallback | Research comparator |
+| Gundogan | `gundogan` | Captain: precision pressure, gated turn/river attacks, call-down vs aggressors, M5 style only vs true maniacs | City family candidate |
+| Akanji | `akanji` | Precision pressure with call-down vs all aggressors | City family candidate |
+| Doku | `doku` | All teammate attacks (turn/river/flop-mix, mixed opens, river calls) over the City engine | City family candidate |
+| Stones | `stones` | Disciplined gated turn pressure plus river calls | City family candidate |
+| Ederson | `ederson` | Adaptive exploiter: bluffs folders, thins value vs stations | City family candidate |
+| Mahrez | `mahrez` | Ballsy v2: overbluffs, floats, bluff-raises plus gated pressure, -80bb stop-loss | City family candidate (exploitable by turn-pressure bots) |
+| Haaland / De Bruyne / Rodri / Foden / Bernardo / Grealish | `haaland`, `de_bruyne`, `rodri`, `foden`, `bernardo`, `grealish` | First City family (shared `bots/city_core.py`); `grealish` is the ballsy one | City family comparison candidates |
+| Cherki | `m7_cherki` | Counterplay core + near-threshold precision + M5-classic switch vs aggression | Comparison candidate |
 | Methods 2–4 | `m2_cfr`, `m3_exploit`, `m4_learned` | Earlier experimental policies | Research comparators |
 | MCCFR | `mccfr` | Earlier sequential MCCFR prototype | Research comparator |
 | Portfolio | `equity_core`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, `bayes_ev` | Additional equity and opponent-model variants | Comparison candidates |
