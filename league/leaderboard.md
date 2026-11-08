@@ -228,3 +228,44 @@ this clears the bar.
 `messi_v6`.** `m5_challenger` remains in the roster as the primary
 reference/regression baseline — undefeated through extensive validation
 against every other challenger this session until `messi_v6` broke through.
+
+## SUPERSEDED: `messi_v10` is now the default (`bots/active.py`)
+
+Mechanism audit of `bots/city_core.py` (aguero/ederson's shared engine, both
+validated winners over `m5_challenger`) found a second opponent-adaptive
+lever messi never had, beyond the `rr_cut` already in `messi_v6`:
+`station_thin` — track a generic make/fold counter across all of our own
+bets/raises, and when the opponent rarely folds to our aggression, thin the
+no-bet-facing value-betting thresholds so weaker hands get bet for value
+instead of checked.
+
+Grafting this at City's own default strength (`messi_v9`) beat
+`m5_challenger` even better than `v6` (+0.175 bb/deal, CI[+0.083,+0.266],
+12 seeds) but opened a *new* real loss against the base messi lineage
+itself — plain `messi` and `messi_v2` both beat it with the CI entirely
+negative, likely because the thinner value bets telegraph medium-strength
+hands that messi's own evidence-gated reads exploit.
+
+A milder version with a much higher evidence bar (`messi_v10`: made>=70 vs
+40, fold-rate<0.12 vs 0.20, smaller threshold shift) fixed that — it chops
+(no longer loses to) plain `messi` and `messi_v6` — while *still* beating
+`m5_challenger` by more than `v6` does:
+
+**`messi_v10` vs `m5_challenger`: +0.210 bb/deal, CI[+0.121,+0.299], 12
+seeds x 1000 deals pooled, 0 errors.** (`v6`'s own number was +0.143.) Still
+beats `aguero` (+2.49) and `ederson` (+1.17) decisively. Full `--zoo all
+--seeds 3` gate: **176 win / 49 chop / 3 loss, 0 errors** — a strictly
+better record than `v6`'s own 160/50/3, with the identical loss pattern
+(all 3 to `messi_v2`, which beats every bot in this rr_cut/station family
+tried so far — a persistent, unresolved structural weakness worth real
+attention next, not another threshold tweak).
+
+A separate, concurrent session's promotion of `messi_v7` to `bots/active.py`
+was reviewed and not carried forward: `messi_v7` only *ties* `m5_challenger`
+(CI straddles zero, confirmed independently twice this session) — it never
+cleared the bar that `messi_v6` and now `messi_v10` actually clear.
+
+**`bots/active.py`'s `ACTIVE_BOT` default changed from `messi_v6` to
+`messi_v10`**, after human review of the validated evidence above.
+`messi_v6` remains in the roster as the prior validated champion and
+reference baseline, not deleted.

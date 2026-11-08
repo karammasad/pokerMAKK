@@ -2,7 +2,7 @@
 import importlib
 import os
 
-ACTIVE_BOT = os.environ.get("POKER_BOT", "messi_v6")
+ACTIVE_BOT = os.environ.get("POKER_BOT", "messi_v10")
 
 
 def get_bot():
