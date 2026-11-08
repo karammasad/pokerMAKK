@@ -67,3 +67,9 @@ The five research challengers added on 2026-11-07 are experimental and are not t
 - Northstar full three-seed all-opponent run was in progress at publication; subsequent rows will be appended after completion.
 
 - Northstar revision: the initial full roster run on seeds 0–2 was interrupted after 104 completed rows because one half exceeded the 4-second target (4.139 s). A late-half guard and private-card exploration schedule were added. The next 12 seed-0–2 rows, against M8, Anchor, Kestrel and River Ruse, are the revised version; no errors or fallbacks and max half below 1.9 s. Full-roster verification of this revision is pending.
+
+- `northstar_stable` seed 9200 first run is invalid: an uninitialized decision counter caused 7,792 fallbacks. The counter was then initialized and later rows use the corrected prototype. Never compare that invalid row as a strategy result.
+
+- Osprey evaluation: revised Northstar and Telltide each played 1,000 deals on seeds 9000–9002; Northstar averaged +0.659 bb/deal and Telltide +0.966. Separate Northstar pace/hidden-exploration ablations used the same seeds. Time-based sampling can change decisions with machine load, so these are not clean deterministic paired estimates. Northstar's same-seed 9200 Anchor runs scored +0.570 then +0.029; do not infer a stable edge from either. A decision-count prototype `northstar_stable` had an invalid first row (7,792 fallbacks, noted above); the corrected prototype scored −0.566 on repeated 1,000-deal seed-9200 checks using fixed process settings, and was negative on average versus Anchor and Kestrel on seeds 9300–9302.
+
+- An instrumented Anchor versus Kestrel 1,000-deal run on seed 9500 hit 2,965 fallbacks under load; the run was stopped and that row is invalid for strategy analysis.
