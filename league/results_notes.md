@@ -51,3 +51,5 @@ The five research challengers added on 2026-11-07 are experimental and are not t
 - 2026-11-07: The post-merge Rangeglass full-strength sweep against the enlarged roster was interrupted early during the expanded roster pass (completed seed rows remain appended in `results.csv`; the next opponent had not completed). Those partial rows are useful screens, not a complete roster result.
 
 - 2026-11-07: all five new candidates completed a consistent 200-deal, seed-0 screen against the full current `--zoo all` roster (60 entries including self-play; 300 rows). This is a screening pass only. The focused Telltide holdout then covered 16 priority bots at 1,000 deals on seeds 2000-2002 (48 rows), with 0 errors/fallbacks; see `reports/five-bot-main-screen-2026-11-07.md` and the two CSV slices in `league/benchmarks/`.
+
+- Undertow: 200-deal seed-3000 comparison against Telltide and seven strong opponents was completed; the subsequent 1,000-deal, three-seed full-roster run was paused after 117 of 183 matches. Completed rows are retained; the run is incomplete and must be resumed and verified before promotion. The full test suite passed 94 tests with 1 skipped.
