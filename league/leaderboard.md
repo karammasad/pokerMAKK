@@ -1,3 +1,96 @@
+# Focused frontier round-robin — 2026-11-08
+
+Ten bots, all 45 pairings, seeds 27000–27002, 1000 duplicate deals and both halves per seed, using `league.run.match`. Each result pools 3000 paired deal outcomes. The 95% confidence interval uses pooled paired-deal variance; a win or loss requires it to exclude zero. Individual seed results are appended to `league/results.csv`. The intervals are reconstructed from each seed’s mean and sample variance, including between-seed differences. Three seeds are a screening sample, not a promotion test.
+
+The field includes the prior champion m5_challenger, the Messi base and v2, then-default v6, recovered adaptive v7, the new response-tracking candidate, the three strongest City representatives (aguero, ederson, mahrez), and m9_cfrplus as a distinct CFR-family comparator. Other City variants and historically weaker or redundant research bots are excluded to keep the comparison focused.
+
+**Leader: `messi_v2`.** The live default is now `messi_v7`, promoted after user review. Standings alone do not establish a promotion; v2 led this screen and has a significant deeper head-to-head win over v6, but has not completed a new full zoo gate here.
+
+| Rank | Bot | Points | W-L-C | Avg bb/deal |
+| --- | --- | --- | --- | --- |
+| 1 | `messi_v2` | 7.5 | 6-0-3 | +0.819 |
+| 2 | `messi_v7` | 7.5 | 6-0-3 | +0.777 |
+| 3 | `messi` | 6.5 | 4-0-5 | +0.398 |
+| 4 | `messi_response` | 6.0 | 5-2-2 | +0.578 |
+| 5 | `messi_v6` | 4.5 | 3-3-3 | +0.492 |
+| 6 | `m5_challenger` | 3.5 | 0-2-7 | -0.056 |
+| 7 | `mahrez` | 3.0 | 2-5-2 | -0.597 |
+| 8 | `aguero` | 3.0 | 2-5-2 | -1.169 |
+| 9 | `ederson` | 2.0 | 2-7-0 | -0.587 |
+| 10 | `m9_cfrplus` | 1.5 | 0-6-3 | -0.656 |
+
+## Showdown-range call screen
+
+`messi_showdownrange` keeps v7 and only revisits postflop folds when similar showdown hands provide at least five weighted observations, shrinking the empirical range toward uniform equity. Five seeds (35000–35004) gave −0.0276 bb/deal vs v7 (95% CI [−0.0891, +0.0339]) and −0.0190 vs v2 ([−0.0936, +0.0556]); both chops, with zero errors/fallbacks. It was not advanced to the full zoo.
+
+## Bayesian response model screen
+
+`messi_bayes` replaces v7's step thresholds with a Beta-smoothed reraise estimate. Three seeds (33000–33002) produced +0.0313 bb/deal vs v7 (95% CI [-0.0486, +0.1113]) and -0.0050 vs v2 ([-0.0947, +0.0847]); both chops. Focused tests passed. The result does not justify a full zoo run or promotion.
+
+## Independent deeper checks against the then-default v6
+
+- `messi_v2`: seeds 31000–31009, 10,000 duplicate deals, +0.3015 bb/deal, 95% CI [+0.1855, +0.4175], 0 errors and 0 fallbacks. This confirms a head-to-head edge over v6; a full zoo gate is required before promotion.
+- `messi_v7`: seeds 29000–29009, 10,000 duplicate deals, +0.1763 bb/deal, 95% CI [+0.0775, +0.2751], 0 errors and 0 fallbacks. This independently confirms an edge over v6. The full three-seed zoo gate completed with 153 wins, 75 chops, no losses, 0 errors and fallbacks; maximum thinking time was 2.505 s per half. V7 met the stated head-to-head and zoo criteria and was promoted after user review.
+- `messi_response`: seeds 28000–28009, 10,000 duplicate deals, +0.0108 bb/deal, 95% CI [-0.0349, +0.0565], 0 errors and 0 fallbacks. This is a chop and does not qualify for promotion. The full three-seed zoo gate completed with 172 wins, 51 chops, 5 losses, 0 errors and fallbacks; maximum thinking time was 2.696 s per half.
+
+Against the remaining frontier, independent seeds 30000–30009 yielded v7 vs v2 +0.0350, CI [-0.0037, +0.0737] (chop); vs Messi +0.0787, CI [+0.0257, +0.1317] (win); vs m5_challenger -0.0252, CI [-0.1382, +0.0878] (chop). Each uses 10,000 paired deals, with 0 errors and fallbacks.
+
+The v7 code was recovered unchanged from an existing worktree; its frequency tracker has censored observations, so these are empirical results rather than evidence that its opponent model is unbiased.
+
+## Pairings
+
+| Bot A | Bot B | bb/deal | 95% CI | Verdict |
+| --- | --- | --- | --- | --- |
+| `m5_challenger` | `messi` | +0.0470 | [-0.1403, +0.2343] | chop |
+| `m5_challenger` | `messi_v2` | +0.0083 | [-0.1590, +0.1757] | chop |
+| `m5_challenger` | `messi_v6` | -0.1260 | [-0.3139, +0.0619] | chop |
+| `m5_challenger` | `messi_v7` | -0.0150 | [-0.1882, +0.1582] | chop |
+| `m5_challenger` | `messi_response` | -0.0830 | [-0.2754, +0.1094] | chop |
+| `m5_challenger` | `aguero` | -0.3190 | [-0.5505, -0.0875] | loss |
+| `m5_challenger` | `ederson` | -0.2710 | [-0.4601, -0.0819] | loss |
+| `m5_challenger` | `mahrez` | -0.0960 | [-0.3544, +0.1624] | chop |
+| `m5_challenger` | `m9_cfrplus` | +0.3540 | [-0.0521, +0.7601] | chop |
+| `messi` | `messi_v2` | -0.0367 | [-0.1215, +0.0481] | chop |
+| `messi` | `messi_v6` | -0.0073 | [-0.2748, +0.2602] | chop |
+| `messi` | `messi_v7` | -0.0667 | [-0.1701, +0.0368] | chop |
+| `messi` | `messi_response` | +0.0627 | [-0.1875, +0.3129] | chop |
+| `messi` | `aguero` | +1.7273 | [+1.3606, +2.0941] | win |
+| `messi` | `ederson` | +0.6787 | [+0.3578, +0.9996] | win |
+| `messi` | `mahrez` | +0.6637 | [+0.3008, +1.0265] | win |
+| `messi` | `m9_cfrplus` | +0.6102 | [+0.1971, +1.0232] | win |
+| `messi_v2` | `messi_v6` | +0.5927 | [+0.3708, +0.8146] | win |
+| `messi_v2` | `messi_v7` | -0.0547 | [-0.1219, +0.0126] | chop |
+| `messi_v2` | `messi_response` | +0.6773 | [+0.4579, +0.8968] | win |
+| `messi_v2` | `aguero` | +2.3720 | [+2.0871, +2.6569] | win |
+| `messi_v2` | `ederson` | +1.5103 | [+1.2340, +1.7867] | win |
+| `messi_v2` | `mahrez` | +1.6510 | [+1.3256, +1.9764] | win |
+| `messi_v2` | `m9_cfrplus` | +0.5983 | [+0.1851, +1.0115] | win |
+| `messi_v6` | `messi_v7` | -0.6017 | [-0.8091, -0.3943] | loss |
+| `messi_v6` | `messi_response` | -0.1683 | [-0.2806, -0.0560] | loss |
+| `messi_v6` | `aguero` | +2.4353 | [+2.1594, +2.7113] | win |
+| `messi_v6` | `ederson` | +1.2117 | [+0.9226, +1.5007] | win |
+| `messi_v6` | `mahrez` | +1.7590 | [+1.4391, +2.0789] | win |
+| `messi_v6` | `m9_cfrplus` | +0.2495 | [-0.1422, +0.6412] | chop |
+| `messi_v7` | `messi_response` | +0.4753 | [+0.2617, +0.6889] | win |
+| `messi_v7` | `aguero` | +2.3177 | [+2.0336, +2.6017] | win |
+| `messi_v7` | `ederson` | +1.1570 | [+0.8638, +1.4502] | win |
+| `messi_v7` | `mahrez` | +1.7350 | [+1.4097, +2.0603] | win |
+| `messi_v7` | `m9_cfrplus` | +0.5682 | [+0.1586, +0.9778] | win |
+| `messi_response` | `aguero` | +2.5063 | [+2.2366, +2.7760] | win |
+| `messi_response` | `ederson` | +1.2387 | [+0.9551, +1.5222] | win |
+| `messi_response` | `mahrez` | +1.7880 | [+1.4741, +2.1019] | win |
+| `messi_response` | `m9_cfrplus` | +0.6328 | [+0.2350, +1.0307] | win |
+| `aguero` | `ederson` | +0.3903 | [+0.1470, +0.6336] | win |
+| `aguero` | `mahrez` | +0.0533 | [-0.2293, +0.3359] | chop |
+| `aguero` | `m9_cfrplus` | +0.0708 | [-0.3262, +0.4678] | chop |
+| `ederson` | `mahrez` | -0.9797 | [-1.3145, -0.6449] | loss |
+| `ederson` | `m9_cfrplus` | +1.6163 | [+1.1238, +2.1089] | win |
+| `mahrez` | `m9_cfrplus` | +1.2057 | [+0.6248, +1.7865] | win |
+
+---
+
+# Historical leaderboard (earlier field)
+
 # Round-robin leaderboard — official format (real results)
 
 Official-format round-robin: 12 bots, 66 pairings, 3 seeds (0,1,2) pooled per pairing (3000 deals/pairing total), 1000 deals/seed x 2 halves/match — matches the competition's duplicate format (1000 deals x 2 halves per seed, pooled bb/deal, 95% CI verdict: win if CI entirely >0, loss if entirely <0, chop otherwise). `harrier` (CFR-family research bot) is not yet merged to origin/main as of this run and is not included; add it and re-run once it lands. `messi` was added mid-run (teammate push) and given the same treatment: full pooled pairings vs every other shortlist bot.
