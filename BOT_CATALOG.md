@@ -27,6 +27,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Hawk | `m1_team_tuned` | Teammate's tuned Method 1 snapshot from branch `codex/method1` | Evaluation candidate |
 | Swift Rook | `rook_fast` | Rook with identical-equity river optimization and per-hand caching | Evaluation candidate |
 | Frozen Scout | `m1_reference` | Teammate's frozen Method 1 control | Research comparator |
+| Kestrel | `kestrel` | Talon with the evidence-gated semi-bluff extended from turn-only to turn and river | Research candidate, not promoted |
 | Equity sparring | `equity_balanced`, `equity_tight`, `equity_loose` | Teammate's frozen-equity threshold variants | In-process sparring opponents |
 | Portfolio | `equity_core`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, `bayes_ev` | Additional equity and opponent-model variants | Comparison candidates |
 
