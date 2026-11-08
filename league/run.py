@@ -20,7 +20,7 @@ ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_p
 PORTFOLIO = list(portfolio_names())
 RESEARCH_CANDIDATES = PORTFOLIO + [
     "atlas", "atlas_learning", "messi", "messi_v2", "messi_v3", "messi_v4", "messi_v5", "messi_v6",
-    "messi_v7", "messi_v9", "messi_v10", "messi_showdownrange", "messi_bayes", "messi_response", "messi_riverprobe",
+    "messi_v7", "messi_v9", "messi_v10", "messi_v11", "messi_showdownrange", "messi_bayes", "messi_response", "messi_riverprobe",
     "m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger", "m5_classic",
     "m5_counterplay", "turnblade", "duskfox", "nightjar", "tidehunter", "mirrorfin",
     "m6_safeadapt", "m7_cherki", "m7_precision", "m8_bayes_types", "m9_cfrplus",
