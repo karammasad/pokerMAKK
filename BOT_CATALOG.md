@@ -13,6 +13,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Tidehunter | `tidehunter` | Turn pressure plus mixed button opens | Counterplay challenger |
 | Mirrorfin | `mirrorfin` | Turn pressure plus selective river calls | Counterplay challenger |
 | Rook | `m11_chosen` | Anchor preflop and Talon postflop | Comparison candidate |
+| Rangefinder | `rangefinder` | M5-derived policy with confidence-shrunk showdown range updates | Research challenger |
 | Lens | `m7_precision` | Anchor with selective extra equity sampling | Comparison candidate |
 | Guard | `equity_guarded` | Guarded equity portfolio policy | Comparison candidate |
 | Scout | `m1_equity` | Original equity policy | Baseline |
