@@ -1,7 +1,7 @@
 """stones: Disciplined pressure: gated turn pressure + river calls only, thin value vs stations, no extra bluffs."""
 from bots import city_core as core
 
-PROFILE = {'tb_turn': True, 'river_call_margin': 0.28, 'station_thin': True, 'bluff': 0.0}
+PROFILE = {'rr_cut': 0.85, 'no_refine_s': 1.1, 'panic_s': 1.8, 'panic_samples': 10, 'tb_turn': True, 'river_call_margin': 0.28, 'station_thin': True, 'bluff': 0.0}
 
 
 def load():

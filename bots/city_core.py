@@ -42,7 +42,7 @@ DEFAULTS = {
     # teammate-proven counterplay attacks (gated by measured fold response)
     "tb_turn": False, "tb_river": False, "tb_flop_mix": False, "tb_gate": True,
     "open_mix": False, "river_call_margin": None, "station_thin": False,
-    "catch_rate": None,
+    "catch_rate": None, "rr_cut": None, "cb_exploit": False, "cb_margin": 0.08, "cb_reraise": 0.78,
     # stop-loss (in big blinds, 0 disables) -> switch to SAFE override
     "stop_loss_bb": 0,
 }
@@ -60,7 +60,8 @@ def new_half(config, memory):
     m5.new_half(config, memory)
     memory["_city"] = {"hand": -1, "seen": 0, "acts": 0, "raises": 0,
                        "made": 0, "folded": 0, "pending": False, "net": 0,
-                       "tb_trials": 0, "tb_folds": 0, "tb_pending": None}
+                       "tb_trials": 0, "tb_folds": 0, "tb_pending": None,
+                       "cb_opps": 0, "cb_bets": 0, "chk": None}
 
 
 def _draw(obs, salt):
@@ -70,7 +71,18 @@ def _draw(obs, salt):
 def _observe(obs, st):
     if st["hand"] != obs.hand_index:
         st["hand"], st["seen"] = obs.hand_index, 0
-    for rec in obs.action_history[st["seen"]:]:
+    hist = obs.action_history
+    for idx in range(st["seen"], len(hist)):
+        rec = hist[idx]
+        first = idx == 0 or hist[idx - 1].street != rec.street
+        if rec.street != Street.PREFLOP:
+            if rec.is_me and first and rec.action == Action.CHECK_CALL:
+                st["chk"] = rec.street
+            elif not rec.is_me and st["chk"] == rec.street:
+                st["cb_opps"] += 1
+                if rec.action in (Action.RAISE_HALF, Action.RAISE_POT):
+                    st["cb_bets"] += 1
+                st["chk"] = None
         if not rec.is_me:
             st["acts"] += 1
             if rec.action in (Action.RAISE_HALF, Action.RAISE_POT):
@@ -85,6 +97,24 @@ def _params(profile, st):
     if loss and st["net"] < -loss * game.BIG_BLIND:
         p.update(SAFE)
     return p
+
+
+def _always_bets(st):
+    """Opponent bets (almost) every time we check to them: their bet is uninformative."""
+    return st["cb_opps"] >= 20 and (st["cb_bets"] + 1.0) / (st["cb_opps"] + 2.0) >= 0.75
+
+
+def _facing_bet_after_check(obs):
+    recs = [r for r in obs.action_history if r.street == obs.street]
+    return (len(recs) == 2 and recs[0].is_me and recs[0].action == Action.CHECK_CALL
+            and recs[1].action in (Action.RAISE_HALF, Action.RAISE_POT))
+
+
+def _facing_reraise(obs):
+    """The opponent raised a bet/raise of ours on this street: their range is very strong."""
+    recs = [r for r in obs.action_history if r.street == obs.street]
+    return (len(recs) >= 2 and recs[-1].action in (Action.RAISE_HALF, Action.RAISE_POT)
+            and any(r.is_me and r.action in (Action.RAISE_HALF, Action.RAISE_POT) for r in recs[:-1]))
 
 
 def _raise_rate(st):
@@ -174,14 +204,17 @@ def choose_action(profile, obs, memory):
     if (p["catch_rate"] is not None and not aggressive and st["acts"] >= p["min_actions"]
             and rate >= p["catch_rate"]):
         margin -= 0.07  # bluff-catcher: opponent raises often but not like a maniac
-    if p["river_call_margin"] is not None and obs.street == Street.RIVER:
+    exploit = (p["cb_exploit"] and obs.to_call and _always_bets(st) and _facing_bet_after_check(obs))
+    if exploit:
+        margin = min(margin, p["cb_margin"])
+    if p["river_call_margin"] is not None and obs.street == Street.RIVER and not exploit:
         margin = min(margin, p["river_call_margin"])
     thin = p["station_thin"] and st["made"] >= 40 and _fold_rate(st) < 0.20
     if thin:
         p["half_cut"] -= 0.04
         p["pot_cut"] -= 0.03
     if obs.to_call:
-        thresholds = (p["reraise_cut"], odds + margin)
+        thresholds = (p["reraise_cut"] if not exploit else p["cb_reraise"], odds + margin)
     else:
         thresholds = (p["pot_cut"], p["half_cut"])
     eq = _equity(p, obs, memory, thresholds)
@@ -194,7 +227,10 @@ def choose_action(profile, obs, memory):
         return action
 
     if obs.to_call:
-        if eq >= p["reraise_cut"]:
+        if (p["rr_cut"] is not None and obs.to_call > 2 and Action.FOLD in legal
+                and eq < p["rr_cut"] and _facing_reraise(obs)):
+            return Action.FOLD
+        if eq >= (p["cb_reraise"] if exploit else p["reraise_cut"]):
             return aggress(_pick(legal, Action.RAISE_POT, Action.RAISE_HALF))
         if (p["bluff_raise"] and p["bluff_raise_band"][0] <= eq <= p["bluff_raise_band"][1]
                 and obs.raises_this_street == 0 and _draw(obs, 3) < p["bluff_raise"] * scale
