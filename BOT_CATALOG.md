@@ -41,6 +41,7 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Swift Rook | `rook_fast` | Rook with identical-equity river optimization and per-hand caching | Evaluation candidate |
 | Frozen Scout | `m1_reference` | Teammate's frozen Method 1 control | Research comparator |
 | Kestrel | `kestrel` | Talon with the evidence-gated semi-bluff extended from turn-only to turn and river | Research candidate, not promoted |
+| Osprey | `osprey` | Talon with postflop equity estimated against a reweighted opponent-hand particle filter instead of a uniform random hand | Research candidate, not promoted (pooled -0.41 bb/deal vs m5_challenger over 10k deals, essentially Talon's own baseline deficit; beats the rest of the zoo: 85 win / 48 chop / 17 loss over the single-seed `--zoo all` gate) |
 | Equity sparring | `equity_balanced`, `equity_tight`, `equity_loose` | Teammate's frozen-equity threshold variants | In-process sparring opponents |
 | Portfolio | `equity_core`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, `bayes_ev` | Additional equity and opponent-model variants | Comparison candidates |
 
