@@ -4,7 +4,12 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 
 | Label | Runnable ID | Description | Status |
 | --- | --- | --- | --- |
-| Messi | `messi` | Adaptive pressure with response-gated reraises and a late-half timing guard | Research challenger |
+| Messi | `messi` | Adaptive pressure with response-gated reraises and a late-half timing guard | Research challenger; chops m5_challenger at 30-seed pooled depth |
+| Messi v2 | `messi_v2` | Messi with a tightened raise-the-raiser bluff (more evidence, smaller cost cap) | Research challenger; screened only (5 seeds) |
+| Messi v3 | `messi_v3` | Messi with a looser preflop steal and looser raise-the-raiser bluff | Research challenger; confirmed loser vs m5_challenger (5-seed screen, CI entirely negative) |
+| Messi v4 | `messi_v4` | Messi with the raise-the-raiser bluff removed entirely (diagnostic variant) | Research challenger; screened only (5 seeds) |
+| Messi v5 | `messi_v5` | Messi with a looser checked-to-river semi-bluff gate | Research challenger; screened only (5 seeds), no improvement |
+| Messi v6 | `messi_v6` | Messi v2's tightened bluff plus a City-engine-style reraise-discipline fold (fold to a reraise unless equity >=0.85) | Research challenger; strongest variant found this pass -- beats aguero/ederson/mahrez, improves (but does not yet resolve) the m5_challenger chop |
 | Anchor | `m5_challenger` | Adaptive turn pressure over the counterplay equity policy | Current entry default |
 | Talon | `m5_counterplay` | Refined preflop table and pressure-oriented postflop policy | Team comparison candidate |
 | M5 Classic | `m5_classic` | Preserved original M5; anchor for existing teammate strategies | Historical reference |

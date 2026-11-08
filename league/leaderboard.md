@@ -126,3 +126,84 @@ The 3-seed round-robin above is noisy (this project has already been burned once
 | `m9_cfrplus` | `aguero` | +0.0400 | [-0.3467,+0.4267] | chop |
 | `m9_cfrplus` | `messi` | -0.6873 | [-1.1013,-0.2734] | loss |
 | `aguero` | `messi` | -1.3670 | [-1.7341,-0.9999] | loss |
+
+## Messi iteration — a genuine, validated edge over m5_challenger
+
+Directive: push `messi` (the strongest top-5 bot, but previously only a chop
+against `m5_challenger` specifically) toward a real win over `m5_challenger`,
+without trading away its dominance over the rest of the top-5. Started from
+the 10-seed baseline: `m5_challenger` vs `messi` = +0.0564 bb/deal for
+`m5_challenger` (chop, CI straddled zero) — then re-confirmed at 30 seeds
+(6000-6029, n=30000): +0.0377 for `m5_challenger`, CI[-0.0182,+0.0936], still
+a chop, very slightly leaning `m5_challenger`'s way.
+
+**Mechanism.** `messi` = `m5_challenger`'s own policy (`bots/common/counter_strategies`
+with profile `'m5_challenger'`) plus three additive layers: (1) a 1-in-4 mixed
+light preflop button open, (2) a 1-in-4 checked-to-river semi-bluff gated on
+observed turn fold-rate, (3) a "raise-the-raiser" layer that converts a fold
+facing a bet into a bluff-reraise once observed fold-rate to that bluff is
+high enough. Since `messi`'s base *is* `m5_challenger`, the matchup is close
+to a mirror match with extra aggression layered on — which explains why it
+was landing close to even.
+
+**Why City bots (`aguero`/`ederson`) genuinely beat `m5_challenger` (read
+`bots/city_core.py` and compared `aguero`/`ederson`'s profiles against
+`m5_challenger`):** the single most portable, purely defensive mechanism is
+`rr_cut=0.85` — City bots fold to a **reraise** (a raise of our own
+bet/raise, not just a first bet) unless equity >=0.85, treating a reraise
+range as far stronger than a first-bet range. `m5_challenger`/`messi` have no
+such reraise-specific bar; they fold facing *any* bet using the same flat
+`odds + 0.30` margin regardless of whether it's a first bet or a reraise.
+The rest of City's edge (`station_thin`, `cb_exploit`, tuned bluff
+frequencies, near-threshold equity refinement) is aggression/bluff-tuning —
+exactly the category of exploitable pattern `messi` already punishes hard in
+`aguero` (+1.92 bb/deal head-to-head) — so per explicit instruction, none of
+that was grafted onto `messi`; only the purely-defensive `rr_cut` idea was
+tried, specifically to avoid making `messi` more `aguero`-like.
+
+**Variants built and screened (5 seeds x 1000 deals vs `m5_challenger`
+unless noted; all registered in `league/run.py`'s `RESEARCH_CANDIDATES`,
+`tests/test_messi_v*.py`, and `BOT_CATALOG.md`, win or lose):**
+
+| Variant | Change from `messi` | vs `m5_challenger` (own persp.) | Verdict |
+| --- | --- | --- | --- |
+| `messi_v2` | Tighten raise-the-raiser bluff (more evidence, smaller cost cap) | +0.0598 | chop (improved) |
+| `messi_v3` | Loosen preflop steal + raise-the-raiser bluff | -0.2030 [-0.3689,-0.0371] | **loss** (confirmed bad — more bluffing hurts) |
+| `messi_v4` | Remove raise-the-raiser layer entirely (diagnostic) | +0.0502 | chop (~same as v2) |
+| `messi_v5` | Loosen checked-to-river semi-bluff gate | -0.0498 | chop (no improvement) |
+| `messi_v6` | `messi_v2`'s tightened bluff **+ City-style `rr_cut`=0.85 reraise discipline** | see below | **real win** |
+
+`messi_v3` confirms the matchup punishes extra bluffing — consistent with
+`messi`'s base already being `m5_challenger`'s own policy. `messi_v2`/`v4`
+show the raise-the-raiser layer, as originally tuned, was roughly neutral to
+slightly costly; tightening or removing it both helped a little. The real
+breakthrough was adding the purely-defensive reraise discipline.
+
+**`messi_v6` — validated results:**
+
+| Matchup | Depth | bb/deal (messi_v6 persp.) | CI | Verdict |
+| --- | --- | --- | --- | --- |
+| vs `m5_challenger` | 15 seeds (9000-9014), n=15000 | **+0.1431** | **[+0.0547,+0.2314]** | **win** |
+| vs `messi` (original) | 5 seeds (9100-9104), n=5000 | +0.0428 | [-0.1775,+0.2631] | chop |
+| vs `aguero` | 8 seeds (10000-10007), n=8000 | +2.5820 | [+2.4121,+2.7519] | win |
+| vs `ederson` | 8 seeds (10000-10007), n=8000 | +1.0904 | [+0.9048,+1.2759] | win |
+| vs `mahrez` | 8 seeds (10000-10007), n=8000 | +1.8405 | [+1.6344,+2.0466] | win |
+
+0 errors across every run above.
+
+**This is the first bot this project has validated with a statistically
+significant, CI-entirely-positive edge over `m5_challenger` at full depth
+(15 seeds, exceeding the 8-10 seed policy bar) that also does not trade away
+anything — `messi_v6` *improves* on original `messi`'s already-dominant
+numbers against the rest of the top-5** (`aguero` +1.92 -> +2.58, `ederson`
++0.72 -> +1.09, `mahrez` +0.90 -> +1.84), chops with original `messi` itself
+(a near-identical mirror, as expected since v6 is a strict refinement of the
+same base), and genuinely beats `m5_challenger` where every prior top-5
+member only tied or lost to it with less margin.
+
+**Recommendation for human review:** `messi_v6` is a strong, validated
+promotion candidate — real edge over `m5_challenger` (+0.143 bb/deal, CI
+entirely positive, 15000 deals), and strictly better than or equal to every
+other top-5 bot it was tested against. Per standing policy `bots/active.py`
+has **not** been touched; promoting it to the live default is the human's
+call.
