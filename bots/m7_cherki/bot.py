@@ -14,7 +14,7 @@ from game import Action, Street
 
 CONFIG = {"base_samples": 32, "refine_samples": 64, "band": 0.04, "adapt": True,
           "aggro_rate": 0.45, "min_actions": 40,
-          "no_refine_s": 1.8, "panic_s": 3.0, "panic_samples": 12}
+          "no_refine_s": 1.0, "panic_s": 1.7, "panic_samples": 8}
 
 
 def load():
