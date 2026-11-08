@@ -4,9 +4,16 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 
 | Label | Runnable ID | Description | Status |
 | --- | --- | --- | --- |
-| Anchor | `m5_challenger` | Equity strategy with selective folds and river bluffs | Current entry default |
+| Anchor | `m5_challenger` | Adaptive turn pressure over the counterplay equity policy | Current entry default |
 | Talon | `m5_counterplay` | Refined preflop table and pressure-oriented postflop policy | Team comparison candidate |
+| M5 Classic | `m5_classic` | Preserved original M5; anchor for existing teammate strategies | Historical reference |
+| Turnblade | `turnblade` | Fixed turn pressure | Counterplay challenger |
+| Duskfox | `duskfox` | Turn and river pressure | Counterplay challenger |
+| Nightjar | `nightjar` | Turn pressure with mixed flop and river bluffs | Counterplay challenger |
+| Tidehunter | `tidehunter` | Turn pressure plus mixed button opens | Counterplay challenger |
+| Mirrorfin | `mirrorfin` | Turn pressure plus selective river calls | Counterplay challenger |
 | Rook | `m11_chosen` | Anchor preflop and Talon postflop | Comparison candidate |
+| Rangefinder | `rangefinder` | M5-derived policy with confidence-shrunk showdown range updates | Research challenger |
 | Lens | `m7_precision` | Anchor with selective extra equity sampling | Comparison candidate |
 | Guard | `equity_guarded` | Guarded equity portfolio policy | Comparison candidate |
 | Scout | `m1_equity` | Original equity policy | Baseline |
@@ -17,6 +24,8 @@ These are human-readable labels for discussion. The **runnable ID** remains the 
 | Methods 2–4 | `m2_cfr`, `m3_exploit`, `m4_learned` | Earlier experimental policies | Research comparators |
 | MCCFR | `mccfr` | Earlier sequential MCCFR prototype | Research comparator |
 | Portfolio | `equity_core`, `equity_pressure`, `equity_precise`, `bayes_adaptive`, `bayes_ev` | Additional equity and opponent-model variants | Comparison candidates |
+
+Historical `m5_challenger` results before the adaptive turn-pressure upgrade describe the strategy now preserved as `m5_classic`. The existing M6, M8–M11, and Cherki policies retain that classic dependency so their behavior is not silently changed.
 
 Historical results called `m6_counter` refer to the policy now stored as `m5_counterplay` (Talon), as documented in `league/results_notes.md`. Historical rows using the same ID can also represent different code versions: check their notes and commit before comparing them.
 

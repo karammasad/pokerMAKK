@@ -4,7 +4,7 @@ This is a small research prototype inspired by safe opponent adaptation. It
 keeps M5 as the anchor, uses only public action responses, and caps river-bluff
 suppression changes per half. It is not a reproduction of SafeAdapt-Poker.
 """
-from bots.m5_challenger import bot as anchor
+from bots.m5_classic import bot as anchor
 from game import Action, Street
 
 

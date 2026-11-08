@@ -5,7 +5,7 @@ history. It is inspired by Bayes' Bluff, not a reproduction of that solver.
 """
 import math
 
-from bots.m5_challenger import bot as anchor
+from bots.m5_classic import bot as anchor
 from game import Action, Street
 
 

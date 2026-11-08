@@ -7,7 +7,7 @@
   switches to M5 challenger (better against aggressive spew); else counterplay.
 """
 from bots.m5_counterplay import bot as core
-from bots.m5_challenger import bot as m5
+from bots.m5_classic import bot as m5
 from bots.m1_equity import bot as base
 from bots.common.equity import equity_vs_random
 from game import Action, Street

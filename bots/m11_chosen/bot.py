@@ -2,7 +2,7 @@
 
 A candidate for empirical evaluation, not an equilibrium strategy.
 """
-from bots.m5_challenger import bot as anchor
+from bots.m5_classic import bot as anchor
 from bots.m5_counterplay import bot as pressure
 from game import Street
 

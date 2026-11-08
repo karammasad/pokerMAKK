@@ -19,7 +19,7 @@ ZOO = ["random", "calling_station", "always_half", "always_pot", "nit", "loose_p
 PORTFOLIO = list(portfolio_names())
 RESEARCH_CANDIDATES = PORTFOLIO + [
     "m1_equity", "m2_cfr", "m3_exploit", "m4_learned", "m5_challenger",
-    "m5_counterplay", "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr", "m11_chosen", "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish", "mccfr",
+    "m5_counterplay", "m7_cherki", "m6_safeadapt", "m7_precision", "m8_bayes_types", "m9_cfrplus", "m10_seq_cfr", "m11_chosen", "haaland", "de_bruyne", "rodri", "foden", "bernardo", "grealish", "mccfr", "rangefinder",
 ]
 
 

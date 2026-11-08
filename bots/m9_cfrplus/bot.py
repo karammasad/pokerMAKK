@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import random
 
-from bots.m5_challenger import bot as fallback
+from bots.m5_classic import bot as fallback
 from bots.mccfr.core import info_key
 from game import Action
 
