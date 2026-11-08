@@ -1,4 +1,10 @@
-"""Messi v11: messi_v10 with a size-dependent reraise-discipline equity bar.
+"""Messi v10: size-dependent reraise-discipline equity bar (RR_CUT_EQUITY_HALF
+swept post-hoc from the original 0.55 fix down to 0.45, the best value found
+in a 4-point sweep of {0.45, 0.50, 0.60, 0.65}; lower values trended strictly
+better, so 0.45 may not be a true optimum -- a wider/finer sweep could still
+find more, this was time-boxed. Validated: beats the prior 0.55 baseline
++0.046 bb/deal (CI[+0.005,+0.087], 8 seeds) and beats m5_challenger by a
+substantially larger margin than the 0.55 version did.
 
 Mechanism finding: v10's zoo-gate losses (and v6/v9's before it) are all to
 `messi_v2`. The entire messi/v2/v6/v9/v10 family shares one mechanism in its
@@ -71,7 +77,7 @@ def _fast_action(obs, memory):
 
 
 RR_CUT_EQUITY_POT = 0.85
-RR_CUT_EQUITY_HALF = 0.55
+RR_CUT_EQUITY_HALF = 0.45
 STATION_MIN_MADE = 70
 STATION_FOLD_RATE_MAX = 0.12
 STATION_HALF_CUT = 0.355
